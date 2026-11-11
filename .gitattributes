@@ -1,0 +1,4 @@
+# Normaliza fim de linha: LF no repositório e no checkout (hooks .sh quebram com CRLF no Windows).
+* text=auto eol=lf
+*.sh text eol=lf
+*.{png,jpg,jpeg,gif,ico,webp,ttf,otf,woff,woff2} binary

@@ -34,3 +34,13 @@ CLAUDE.local.md
 # Sistema
 .DS_Store
 *.log
+
+# Next.js / Expo gerados
+next-env.d.ts
+expo-env.d.ts
+web-build/
+.vercel/
+*.pem
+
+# Prisma client gerado
+apps/api/src/generated/
