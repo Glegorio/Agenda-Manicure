@@ -8,3 +8,6 @@ coverage/
 docs/00-especificacao-original.md
 apps/api/src/generated/
 next-env.d.ts
+
+# Config do harness do Claude Code (mantida como escrita)
+.claude/

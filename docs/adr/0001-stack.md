@@ -12,19 +12,19 @@ ecossistema maduro para datas/fusos.
 
 ## Decisão
 
-| Camada | Escolha |
-|---|---|
-| Linguagem | TypeScript (strict) em todo o monorepo |
-| Mobile | Expo (React Native) + Expo Router + TanStack Query + expo-secure-store/notifications/contacts/haptics |
-| Web booking | Next.js (App Router, RSC) como PWA |
-| API | NestJS + Prisma |
-| Banco | PostgreSQL 16 (extensões `btree_gist`, `citext`) |
-| Validação/contratos | Zod em `packages/contracts`, compartilhado por api/web/mobile |
-| Datas | `date-fns` + `@date-fns/tz` |
-| Jobs | pg-boss (fila sobre Postgres) |
-| Tempo real | SSE (app ← API) |
-| Testes | Vitest (unit/integração), Supertest (HTTP), Playwright + axe (web), jest-expo + RNTL (mobile), fast-check (propriedades) |
-| Ícones | Lucide |
+| Camada              | Escolha                                                                                                                  |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Linguagem           | TypeScript (strict) em todo o monorepo                                                                                   |
+| Mobile              | Expo (React Native) + Expo Router + TanStack Query + expo-secure-store/notifications/contacts/haptics                    |
+| Web booking         | Next.js (App Router, RSC) como PWA                                                                                       |
+| API                 | NestJS + Prisma                                                                                                          |
+| Banco               | PostgreSQL 16 (extensões `btree_gist`, `citext`)                                                                         |
+| Validação/contratos | Zod em `packages/contracts`, compartilhado por api/web/mobile                                                            |
+| Datas               | `date-fns` + `@date-fns/tz`                                                                                              |
+| Jobs                | pg-boss (fila sobre Postgres)                                                                                            |
+| Tempo real          | SSE (app ← API)                                                                                                          |
+| Testes              | Vitest (unit/integração), Supertest (HTTP), Playwright + axe (web), jest-expo + RNTL (mobile), fast-check (propriedades) |
+| Ícones              | Lucide                                                                                                                   |
 
 Versões: usar as **estáveis mais recentes** no momento do scaffold (fase 0) e fixá-las no
 lockfile. Registrar as versões principais em `CLAUDE.md` → "Stack".

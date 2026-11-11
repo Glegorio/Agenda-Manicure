@@ -10,14 +10,22 @@
       "outputs": ["dist/**"]
     },
     "typecheck": {
-      "dependsOn": ["^typecheck", "db:generate"]
+      "dependsOn": ["^typecheck", "db:generate"],
+      "outputs": []
     },
     "lint": {
-      "dependsOn": ["db:generate"]
+      "dependsOn": ["db:generate"],
+      "outputs": []
     },
     "test": {
       "dependsOn": ["^build", "db:generate"],
-      "env": ["TZ", "DATABASE_URL", "DATABASE_URL_TEST"]
+      "env": ["TZ", "DATABASE_URL", "DATABASE_URL_TEST"],
+      "outputs": []
+    },
+    "dev": {
+      "dependsOn": ["^build", "db:generate"],
+      "cache": false,
+      "persistent": true
     }
   }
 }

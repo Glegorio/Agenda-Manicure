@@ -6,6 +6,14 @@
 
 <!-- ENTRADAS -->
 
+## 2026-11-11 — 0.7 concluída
+
+- Scripts raiz: `dev` (turbo persistente: api 3333, web 3000, Metro 8081), `build`, `lint`,
+  `typecheck`, `test`, `db:generate`, `format`, `format:check` — todos verdes.
+- `pnpm dev` validado com os três apps respondendo ao mesmo tempo.
+- Docs formatados com Prettier (só alinhamento de tabelas/listas); `.claude/` fora do Prettier.
+- Próximo: 0.8 (CI no GitHub Actions com Postgres).
+
 ## 2026-11-11 — 0.6 concluída
 
 - `apps/mobile`: Expo 58 + Expo Router, tela placeholder (safe area, cores claro/escuro

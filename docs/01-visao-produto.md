@@ -13,10 +13,10 @@ e nenhuma visão financeira.
 
 Uma plataforma SaaS mobile-first com duas superfícies:
 
-| Superfície | Usuária | Objetivo |
-|---|---|---|
-| **App Mobile** (iOS/Android) | A profissional | Configurar serviços e escala, ver a agenda, dar baixa nos atendimentos, ver o financeiro |
-| **Web Booking** (PWA, sem instalação) | A cliente final | Escolher serviço → horário → confirmar, em menos de 1 minuto |
+| Superfície                            | Usuária         | Objetivo                                                                                 |
+| ------------------------------------- | --------------- | ---------------------------------------------------------------------------------------- |
+| **App Mobile** (iOS/Android)          | A profissional  | Configurar serviços e escala, ver a agenda, dar baixa nos atendimentos, ver o financeiro |
+| **Web Booking** (PWA, sem instalação) | A cliente final | Escolher serviço → horário → confirmar, em menos de 1 minuto                             |
 
 ## Personas
 
@@ -36,6 +36,7 @@ Uma plataforma SaaS mobile-first com duas superfícies:
 ## Escopo do MVP (v1)
 
 Dentro:
+
 - Uma profissional por conta (single-tenant por profissional; ver questões em aberto sobre salões).
 - CRUD de serviços, escala semanal com pausas, buffer, exceções de data (folga/feriado).
 - Link público com slug, fluxo de 3 etapas, hold de 5 min, confirmação.
@@ -45,6 +46,7 @@ Dentro:
 - Importação de contatos do celular (com consentimento — ver LGPD).
 
 Fora do MVP (backlog):
+
 - Pagamento online / sinal (PIX cobrança).
 - Múltiplas profissionais por estabelecimento.
 - Lembretes automáticos D-1 (vem logo após o MVP, a infraestrutura já fica pronta).

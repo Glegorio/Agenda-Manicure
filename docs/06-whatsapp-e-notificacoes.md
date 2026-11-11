@@ -2,10 +2,10 @@
 
 ## Estratégia em fases (ver ADR-0004)
 
-| Fase | Canal | Custo | Automático? | Uso |
-|---|---|---|---|---|
-| A (MVP) | **Deep link** `https://wa.me/<num>?text=<urlencoded>` | zero | Não — abre o WhatsApp com texto pronto | Convites da profissional; botão "Receber confirmação no WhatsApp" para a cliente |
-| B | **Provedor** atrás da porta `WhatsAppGateway` (Z-API **ou** WhatsApp Cloud API oficial) | por mensagem/mensalidade | Sim | Confirmação automática após booking, lembretes |
+| Fase    | Canal                                                                                   | Custo                    | Automático?                            | Uso                                                                              |
+| ------- | --------------------------------------------------------------------------------------- | ------------------------ | -------------------------------------- | -------------------------------------------------------------------------------- |
+| A (MVP) | **Deep link** `https://wa.me/<num>?text=<urlencoded>`                                   | zero                     | Não — abre o WhatsApp com texto pronto | Convites da profissional; botão "Receber confirmação no WhatsApp" para a cliente |
+| B       | **Provedor** atrás da porta `WhatsAppGateway` (Z-API **ou** WhatsApp Cloud API oficial) | por mensagem/mensalidade | Sim                                    | Confirmação automática após booking, lembretes                                   |
 
 `wa.me` funciona em qualquer navegador/dispositivo; `whatsapp://send?text=` só funciona com
 o app instalado — use `wa.me` como padrão e `whatsapp://` apenas dentro do app mobile
@@ -15,8 +15,18 @@ via `Linking.canOpenURL`.
 
 ```ts
 interface WhatsAppGateway {
-  sendText(input: { toE164: string; body: string; idempotencyKey: string }): Promise<{ providerMessageId: string }>;
-  sendTemplate(input: { toE164: string; template: string; language: 'pt_BR'; params: string[]; idempotencyKey: string }): Promise<{ providerMessageId: string }>;
+  sendText(input: {
+    toE164: string;
+    body: string;
+    idempotencyKey: string;
+  }): Promise<{ providerMessageId: string }>;
+  sendTemplate(input: {
+    toE164: string;
+    template: string;
+    language: 'pt_BR';
+    params: string[];
+    idempotencyKey: string;
+  }): Promise<{ providerMessageId: string }>;
 }
 ```
 

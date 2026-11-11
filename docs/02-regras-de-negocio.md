@@ -24,13 +24,13 @@ Cada regra tem um ID (`RN-xx`). Testes devem citar o ID no nome:
   duração estimada (`duration_min`, inteiro, múltiplo de 5, entre 5 e 600), imagem opcional,
   `active` (bool) e `public` (aparece no link).
 - **RN-11** — Alterar preço/duração **não** altera agendamentos já existentes: o agendamento
-  guarda um *snapshot* (`service_name`, `price_cents`, `duration_min`).
+  guarda um _snapshot_ (`service_name`, `price_cents`, `duration_min`).
 - **RN-12** — Serviço com agendamentos não é apagado, é desativado (`active=false`).
 
 ## 3. Escala de trabalho
 
 - **RN-20** — Escala semanal: para cada dia da semana, zero ou mais **janelas de trabalho**
-  (`start_time`, `end_time`). Pausas (almoço) são modeladas como o *espaço entre janelas*
+  (`start_time`, `end_time`). Pausas (almoço) são modeladas como o _espaço entre janelas_
   — ex.: 08:00–12:00 e 13:00–18:00.
 - **RN-21** — Exceções por data (`schedule_exceptions`) sobrepõem a escala semanal:
   `closed` (folga/feriado) ou janelas customizadas para aquela data.
@@ -52,7 +52,7 @@ Entrada: profissional, serviço (duração `D`), data local `d`, agora `now`.
 4. Um candidato `t` é **válido** se e somente se:
    - **RN-30** `t + D ≤ W1` (o serviço cabe inteiro na janela; não atravessa pausa).
    - **RN-31** `[t, t + D + buffer)` não intersecta nenhum intervalo ocupado.
-     (O buffer protege o *próximo* atendimento.)
+     (O buffer protege o _próximo_ atendimento.)
    - **RN-32** Nenhum intervalo ocupado `[s, e+buffer)` intersecta `[t, t + D)`.
      (Já coberto por RN-31, explicitado para os testes.)
    - **RN-33** `t ≥ now + min_notice` e `d ≤ hoje + horizon`.
@@ -66,18 +66,18 @@ Entrada: profissional, serviço (duração `D`), data local `d`, agora `now`.
 
 ### Casos de teste obrigatórios (mínimo)
 
-| # | Cenário | Esperado |
-|---|---|---|
-| T1 | Dia vazio 08–18, D=120, buffer=15, step=15 | 08:00, 08:15, …, 16:00 |
-| T2 | Agendamento 08:00–10:00, D=120, buffer=15 | primeiro livre = 10:15 (RN-34) |
-| T3 | Janelas 08–12 e 13–18, D=90 | nenhum início entre 10:31 e 12:59 que atravesse 12:00 |
-| T4 | D=60, janela fecha 18:00, buffer 15 | 17:00 é válido (RN-35) |
-| T5 | Hold ativo 14:00–15:00 | 14:00 indisponível; hold expirado → disponível |
-| T6 | Exceção `closed` na data | lista vazia |
-| T7 | `now` = 09:10, min_notice 120 | primeiro início ≥ 11:10 |
-| T8 | Dia de troca de horário de verão (fuso com DST, ex. `America/New_York`) | sem horários duplicados/perdidos |
-| T9 | Agendamento CANCELLED | não ocupa |
-| T10 | Duração maior que qualquer janela | lista vazia |
+| #   | Cenário                                                                 | Esperado                                              |
+| --- | ----------------------------------------------------------------------- | ----------------------------------------------------- |
+| T1  | Dia vazio 08–18, D=120, buffer=15, step=15                              | 08:00, 08:15, …, 16:00                                |
+| T2  | Agendamento 08:00–10:00, D=120, buffer=15                               | primeiro livre = 10:15 (RN-34)                        |
+| T3  | Janelas 08–12 e 13–18, D=90                                             | nenhum início entre 10:31 e 12:59 que atravesse 12:00 |
+| T4  | D=60, janela fecha 18:00, buffer 15                                     | 17:00 é válido (RN-35)                                |
+| T5  | Hold ativo 14:00–15:00                                                  | 14:00 indisponível; hold expirado → disponível        |
+| T6  | Exceção `closed` na data                                                | lista vazia                                           |
+| T7  | `now` = 09:10, min_notice 120                                           | primeiro início ≥ 11:10                               |
+| T8  | Dia de troca de horário de verão (fuso com DST, ex. `America/New_York`) | sem horários duplicados/perdidos                      |
+| T9  | Agendamento CANCELLED                                                   | não ocupa                                             |
+| T10 | Duração maior que qualquer janela                                       | lista vazia                                           |
 
 O algoritmo vive em `packages/scheduling` como **função pura** (sem I/O, recebe `now` por
 parâmetro). Ver `.claude/rules/scheduling.md`.
@@ -108,7 +108,7 @@ parâmetro). Ver `.claude/rules/scheduling.md`.
             ┌──────────── cancelar ────────────┐
             │                                   ▼
  SCHEDULED ──iniciar──▶ IN_PROGRESS ──concluir──▶ COMPLETED
-     │                                          
+     │
      ├──── marcar falta ────▶ NO_SHOW
      └──── cancelar ────────▶ CANCELLED
 ```

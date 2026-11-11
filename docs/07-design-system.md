@@ -5,12 +5,12 @@ Tokens vivem em `packages/ui-tokens` e são consumidos por web (CSS variables) e
 
 ## Paletas (primária) — validar contraste AA antes de congelar
 
-| Paleta | `primary` (light) | `onPrimary` | `primary` (dark) | Observação |
-|---|---|---|---|---|
-| Rose Gold | `#B76E79` | `#FFFFFF` | `#E8A9B2` | conferir 4.5:1 do texto branco; escurecer se falhar |
-| Nude Minimal | `#A9826B` | `#FFFFFF` | `#D9B8A3` | idem |
-| Elegance Black | `#1F1F1F` | `#FFFFFF` | `#F2F2F2` | dark usa invertido |
-| Pastel Lilac | `#8E7CC3` | `#FFFFFF` | `#C7B9F0` | idem |
+| Paleta         | `primary` (light) | `onPrimary` | `primary` (dark) | Observação                                          |
+| -------------- | ----------------- | ----------- | ---------------- | --------------------------------------------------- |
+| Rose Gold      | `#B76E79`         | `#FFFFFF`   | `#E8A9B2`        | conferir 4.5:1 do texto branco; escurecer se falhar |
+| Nude Minimal   | `#A9826B`         | `#FFFFFF`   | `#D9B8A3`        | idem                                                |
+| Elegance Black | `#1F1F1F`         | `#FFFFFF`   | `#F2F2F2`        | dark usa invertido                                  |
+| Pastel Lilac   | `#8E7CC3`         | `#FFFFFF`   | `#C7B9F0`        | idem                                                |
 
 Os hex acima são **pontos de partida**. A fase 3 inclui um teste automatizado
 (`packages/ui-tokens/test/contrast.test.ts`) que calcula o contraste WCAG 2.1 de todas as

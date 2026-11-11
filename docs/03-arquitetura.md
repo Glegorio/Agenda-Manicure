@@ -59,20 +59,20 @@ Regra: **controller não fala com Prisma**; **domínio não importa NestJS nem P
 
 ## Módulos do backend
 
-| Módulo | Responsabilidade |
-|---|---|
-| `auth` | Login da profissional (e-mail + senha, JWT access/refresh) |
-| `professionals` | Perfil, slug, tema, timezone, política de cancelamento |
-| `services` | CRUD de serviços |
-| `schedule` | Escala semanal, exceções, buffer, step, antecedência |
-| `availability` | Consulta de slots (usa `packages/scheduling`) |
-| `holds` | Hold de 5 min (RN-40..46) |
-| `appointments` | Agendamentos, transições de status, SSE de mudanças |
-| `clients` | CRM básico, importação de contatos, tags |
-| `closures` | Fechamento diário, despesas |
-| `reports` | KPIs (SQL agregado) |
-| `notifications` | WhatsApp + push, templates, fila e retry |
-| `public` | Endpoints sem auth da booking page (por slug) |
+| Módulo          | Responsabilidade                                           |
+| --------------- | ---------------------------------------------------------- |
+| `auth`          | Login da profissional (e-mail + senha, JWT access/refresh) |
+| `professionals` | Perfil, slug, tema, timezone, política de cancelamento     |
+| `services`      | CRUD de serviços                                           |
+| `schedule`      | Escala semanal, exceções, buffer, step, antecedência       |
+| `availability`  | Consulta de slots (usa `packages/scheduling`)              |
+| `holds`         | Hold de 5 min (RN-40..46)                                  |
+| `appointments`  | Agendamentos, transições de status, SSE de mudanças        |
+| `clients`       | CRM básico, importação de contatos, tags                   |
+| `closures`      | Fechamento diário, despesas                                |
+| `reports`       | KPIs (SQL agregado)                                        |
+| `notifications` | WhatsApp + push, templates, fila e retry                   |
+| `public`        | Endpoints sem auth da booking page (por slug)              |
 
 ## Segurança
 
