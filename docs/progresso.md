@@ -6,7 +6,15 @@
 
 <!-- ENTRADAS -->
 
+## 2026-11-11 — 0.2 concluída
+
+- `.nvmrc` = 26, `.gitattributes` (LF), `.gitignore` ampliado, `core.longpaths` ativo.
+- `.env.example` em api/web/mobile, com os nomes do exemplo da raiz (`API_PORT`, `*_API_BASE_URL` com `/v1`).
+- Regra de deny de leitura ajustada pelo usuário para liberar os arquivos de exemplo.
+- Próximo: 0.3 (compose com banco de teste `agende_test` e extensões).
+
 ## 2026-11-11 — Fase 0 planejada; 0.1 concluída
+
 - Decisões: Node 26 (instalado 26.12.1 via winget), web com CSS Modules, branch principal `main`, remote `origin` no GitHub.
 - 0.1: pnpm 12 + Turborepo 2 + `@agende/config` (TS 6 strict, ESLint 10 flat type-aware, Prettier) + canário `@agende/contracts` (health).
 - ADR-0005: pacotes ESM em `dist` + condição `@agende/source` para fonte TS.
@@ -14,5 +22,6 @@
 - Próximo: 0.2 (`.nvmrc` 26, `.gitattributes`, `.env.example` por app).
 
 ## 2026-11-11 — Harness criado
+
 - Fase atual: 0 (nada implementado ainda).
 - Próximo passo: rodar `/iniciar-fase 0`.

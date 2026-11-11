@@ -12,7 +12,7 @@
 ## Fase 0 — Fundação do monorepo
 
 - [x] 0.1 `pnpm` workspaces + Turborepo + `packages/config` (tsconfig base strict, eslint flat config, prettier)
-- [ ] 0.2 `.nvmrc` (Node LTS), `.editorconfig`, `.gitignore`, `.env.example` por app
+- [x] 0.2 `.nvmrc` (Node LTS), `.editorconfig`, `.gitignore`, `.env.example` por app
 - [ ] 0.3 Validar o `docker-compose.yml` (PostgreSQL 16, já incluso no harness) e criar banco de teste separado
 - [ ] 0.4 Scaffold `apps/api` (NestJS) com `/health`; Prisma inicializado; Vitest configurado
 - [ ] 0.5 Scaffold `apps/web` (Next.js App Router, TS, sem Tailwind obrigatório — decidir no ADR) com página placeholder
