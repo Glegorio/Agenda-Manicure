@@ -93,5 +93,5 @@ Node LTS · pnpm · Turborepo · TypeScript strict · NestJS · Prisma · Postgr
 Next.js (App Router) · Expo + Expo Router · TanStack Query · Zod · date-fns + @date-fns/tz ·
 pg-boss · Vitest · Playwright · jest-expo · fast-check · Lucide.
 
-Pacotes internos `@agende/*`: ESM compilado em `dist/` + condição `@agende/source` para a
-fonte TS (ADR-0005). TypeScript fixado em `~6.0`.
+Pacotes internos `@agende/*`: ESM compilado em `dist/` + condição `@agende/source` (alias no Next) para a
+fonte TS; imports relativos com `.ts` (ADR-0005, ADR-0007). TypeScript fixado em `~6.0`.

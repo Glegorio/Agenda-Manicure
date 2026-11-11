@@ -1,0 +1,8 @@
+.main {
+  display: grid;
+  place-content: center;
+  min-height: 100dvh;
+  padding: max(1.5rem, env(safe-area-inset-top)) max(1.5rem, env(safe-area-inset-right))
+    max(1.5rem, env(safe-area-inset-bottom)) max(1.5rem, env(safe-area-inset-left));
+  text-align: center;
+}

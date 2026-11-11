@@ -6,6 +6,17 @@
 
 <!-- ENTRADAS -->
 
+## 2026-11-11 — 0.5 concluída
+
+- `apps/web`: Next 16 (Turbopack), React 19.3.0 (mesmo do Expo 58), CSS Modules, página placeholder
+  pt-BR com safe area, `color-scheme` e reduzir movimento; teste Vitest + Testing Library.
+- ADR-0007: CSS Modules; imports relativos `.ts` (+ `rewriteRelativeImportExtensions`);
+  `turbopack.resolveAlias` para a fonte de `@agende/contracts` (Turbopack não suporta condições).
+- ⚠️ Alias do Turbopack validado só manualmente (build sem `dist`); a web passa a importar
+  contracts de verdade na 3.2 — conferir lá.
+- Lint web: `@next/eslint-plugin-next` + `react-hooks` (react/jsx-a11y não suportam ESLint 10).
+- Próximo: 0.6 (scaffold `apps/mobile` Expo 58).
+
 ## 2026-11-11 — 0.4 concluída
 
 - `apps/api`: NestJS 12 (ESM), `GET /health` (liveness, fora de `/v1`) com teste e2e Supertest.

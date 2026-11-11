@@ -7,3 +7,4 @@ coverage/
 .expo/
 docs/00-especificacao-original.md
 apps/api/src/generated/
+next-env.d.ts
