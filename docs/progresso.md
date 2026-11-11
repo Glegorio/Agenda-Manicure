@@ -6,6 +6,16 @@
 
 <!-- ENTRADAS -->
 
+## 2026-11-11 — 1.3 concluída
+
+- `slots.property.test.ts`: 10 propriedades fast-check (SP/NY/Lord_Howe, datas de troca de DST,
+  exceções, fora do horizonte): sem sobreposição, cabe na janela, antecedência/data local,
+  ordenação + rótulos canônicos, origem (grade/encaixe), inativos não influem, monotonicidade de
+  buffer/antecedência, completude ao adicionar ocupação, oráculo de dia livre.
+- Validado por mutação: 4 bugs plantados em `slots.ts` detectados (incluindo "esconder horários").
+- `FC_NUM_RUNS` (padrão 200) e `FC_SEED` por env para reproduzir; timeout 60 s; ~6 s na suíte.
+- Próximo: 1.4 `canTransition(from, to)` (RN-50..54).
+
 ## 2026-11-11 — 1.2 concluída
 
 - `computeAvailableSlots()` em `packages/scheduling/src/slots.ts` (RN-30..36, T1..T10 nomeados):
