@@ -31,7 +31,9 @@ Cada regra tem um ID (`RN-xx`). Testes devem citar o ID no nome:
 
 - **RN-20** — Escala semanal: para cada dia da semana, zero ou mais **janelas de trabalho**
   (`start_time`, `end_time`). Pausas (almoço) são modeladas como o _espaço entre janelas_
-  — ex.: 08:00–12:00 e 13:00–18:00.
+  — ex.: 08:00–12:00 e 13:00–18:00. Janelas que se encostam ou se sobrepõem no mesmo dia
+  valem como uma só (08–12 + 12–18 = 08–18, sem pausa); a API recusa salvar janelas
+  sobrepostas (decidido em Q-17).
 - **RN-21** — Exceções por data (`schedule_exceptions`) sobrepõem a escala semanal:
   `closed` (folga/feriado) ou janelas customizadas para aquela data.
 - **RN-22** — `buffer_min` (0–60) é configurado por profissional. Valor padrão: 10.
