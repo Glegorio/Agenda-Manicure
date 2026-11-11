@@ -1,0 +1,36 @@
+# dependências e builds
+node_modules/
+dist/
+build/
+.next/
+out/
+.turbo/
+coverage/
+*.tsbuildinfo
+
+# Expo / React Native
+.expo/
+ios/
+android/
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# Testes
+playwright-report/
+test-results/
+
+# Ambiente e segredos
+.env
+.env.*
+!.env.example
+
+# Claude Code — arquivos pessoais
+CLAUDE.local.md
+.claude/settings.local.json
+
+# Sistema
+.DS_Store
+*.log

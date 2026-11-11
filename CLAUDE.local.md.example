@@ -1,0 +1,5 @@
+# Preferências pessoais (copie para CLAUDE.local.md — não é versionado)
+
+- Explique as decisões com mais detalhe; estou aprendendo esta stack.
+- Meu Postgres local roda na porta 5433.
+- Prefiro que você rode só os testes do pacote alterado, não o monorepo inteiro.
