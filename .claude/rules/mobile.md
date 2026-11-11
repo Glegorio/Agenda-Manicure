@@ -20,3 +20,4 @@ paths:
 - Abrir WhatsApp: `https://wa.me/...` via `Linking.openURL`; `whatsapp://` só após `canOpenURL`.
 - Testes: jest-expo + React Native Testing Library para componentes com lógica; fluxos críticos
   (fechamento diário, transições) com testes de integração da tela.
+- Testes **nunca** dentro de `app/` (o Expo Router transforma todo arquivo ali em rota): use `apps/mobile/__tests__/`.

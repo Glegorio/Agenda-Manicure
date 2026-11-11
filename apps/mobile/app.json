@@ -1,0 +1,12 @@
+{
+  "expo": {
+    "name": "Agende",
+    "slug": "agende",
+    "scheme": "agende",
+    "version": "0.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "plugins": ["expo-router"],
+    "experiments": { "typedRoutes": true }
+  }
+}

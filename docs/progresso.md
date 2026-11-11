@@ -6,6 +6,16 @@
 
 <!-- ENTRADAS -->
 
+## 2026-11-11 — 0.6 concluída
+
+- `apps/mobile`: Expo 58 + Expo Router, tela placeholder (safe area, cores claro/escuro
+  provisórias, rolagem p/ fonte ampliada); jest-expo + RNTL, testes em `apps/mobile/__tests__/`.
+- Metro e Jest leem `@agende/contracts` pela fonte; `expo export` sem `dist` e `expo start`
+  (bundle dev 200) validados; `expo-doctor` 20/20.
+- ADR-0008 (condições Metro/Jest, lint sem eslint-config-expo, `@parcel/watcher` negado).
+- Regra nova em `.claude/rules/mobile.md`: testes nunca dentro de `app/`.
+- Próximo: 0.7 (scripts raiz; formatar docs para `format:check` passar).
+
 ## 2026-11-11 — 0.5 concluída
 
 - `apps/web`: Next 16 (Turbopack), React 19.3.0 (mesmo do Expo 58), CSS Modules, página placeholder

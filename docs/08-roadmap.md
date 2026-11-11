@@ -16,7 +16,7 @@
 - [x] 0.3 Validar o `docker-compose.yml` (PostgreSQL 16, já incluso no harness) e criar banco de teste separado
 - [x] 0.4 Scaffold `apps/api` (NestJS) com `/health`; Prisma inicializado; Vitest configurado
 - [x] 0.5 Scaffold `apps/web` (Next.js App Router, TS, sem Tailwind obrigatório — decidir no ADR) com página placeholder
-- [ ] 0.6 Scaffold `apps/mobile` (Expo, Expo Router, TS) com tela placeholder
+- [x] 0.6 Scaffold `apps/mobile` (Expo, Expo Router, TS) com tela placeholder
 - [ ] 0.7 Scripts raiz: `pnpm dev`, `pnpm test`, `pnpm lint`, `pnpm typecheck`, `pnpm build`
 - [ ] 0.8 CI (GitHub Actions): install → lint → typecheck → test (com serviço Postgres)
 - [ ] 0.9 Atualizar seção "Comandos" do `CLAUDE.md` com os comandos reais

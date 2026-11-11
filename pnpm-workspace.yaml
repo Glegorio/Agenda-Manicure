@@ -9,3 +9,5 @@ allowBuilds:
   '@prisma/engines': true
   '@swc/core': true
   prisma: true
+  # binários pré-compilados; o script só compila do fonte como fallback
+  '@parcel/watcher': false

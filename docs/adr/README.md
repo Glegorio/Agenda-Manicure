@@ -14,6 +14,7 @@ Crie um novo com `/adr <título>`.
 | 0005 | [Estratégia de pacotes internos](0005-pacotes-internos.md) | aceito |
 | 0006 | [API em ESM com NestJS 12, Prisma 7 e Vitest + SWC](0006-api-esm-nest-prisma.md) | aceito |
 | 0007 | [Web com CSS Modules; imports `.ts` nos pacotes internos](0007-web-css-modules-e-resolucao.md) | aceito |
+| 0008 | [App mobile (Expo 58) no monorepo](0008-mobile-expo-monorepo.md) | aceito |
 
 ## Template
 
