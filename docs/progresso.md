@@ -6,6 +6,17 @@
 
 <!-- ENTRADAS -->
 
+## 2026-11-11 — 1.4 concluída
+
+- Decisão de produto (RN-54 no doc 02): SCHEDULED → IN_PROGRESS/COMPLETED/NO_SHOW/CANCELLED;
+  IN_PROGRESS → COMPLETED/CANCELLED; finais imutáveis.
+- `lifecycle.ts`: `canTransition`, `occupiesSchedule` (RN-51, usado em `slots.ts`) e
+  `validateTransition` (RN-52 centavos inteiros ≤ int4; RN-53 `cancelledBy`), mensagens PT-BR.
+- Doc 05: contrato da 2.9 — `paidCents` padrão do snapshot no service, `cancelledBy` do token,
+  `VALIDATION_ERROR` = 400, update condicionado a `status = :from` (corrida → 422).
+- Para a 1.6: enums Zod devem derivar de `PAYMENT_METHODS`/`CANCELLED_BY` (uma só lista).
+- Próximo: 1.5 `packages/money`.
+
 ## 2026-11-11 — 1.3 concluída
 
 - `slots.property.test.ts`: 10 propriedades fast-check (SP/NY/Lord_Howe, datas de troca de DST,

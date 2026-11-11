@@ -68,6 +68,14 @@ Códigos de erro de domínio (sempre `UPPER_SNAKE`):
 | POST      | `/v1/push-tokens`                                       | Registra token Expo                          |
 | POST      | `/v1/invites/preview`                                   | Renderiza mensagem de convite com link       |
 
+Transições (`POST /v1/appointments/:id/transitions`, RN-52..54, domínio em `@agende/scheduling`):
+
+- `to` ∈ `IN_PROGRESS | COMPLETED | NO_SHOW | CANCELLED`; transição fora da tabela RN-54 → `422 INVALID_TRANSITION`.
+- `COMPLETED`: `paymentMethod` obrigatório; `paidCents` opcional — o service usa `price_cents` do snapshot quando ausente (Q-13).
+- `CANCELLED`: `cancelledBy` **não** vem do body — é `PROFESSIONAL` nesta rota (token); `CLIENT` só pelo link da cliente (Q-04).
+- Dados inválidos (Zod ou domínio, `VALIDATION_ERROR`) → `400`.
+- Concorrência: o update condiciona `status = :from` na mesma transação; 0 linhas afetadas → `422 INVALID_TRANSITION`.
+
 ## Webhooks
 
 | Método | Rota                              | Descrição                                 |

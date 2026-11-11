@@ -7,6 +7,7 @@ import {
   resolveDayWindows,
   toLocalIntervals,
 } from './time.ts';
+import { occupiesSchedule } from './lifecycle.ts';
 import type { BusyInterval, Interval, LocalTime, LocalWindow, SlotQuery } from './types.ts';
 
 const MINUTE_MS = 60_000;
@@ -41,9 +42,7 @@ function assertValidQuery({ durationMin, settings }: SlotQuery): void {
 function occupiedInterval(busy: BusyInterval, now: Date): Interval | null {
   switch (busy.kind) {
     case 'appointment':
-      return busy.status === 'SCHEDULED' || busy.status === 'IN_PROGRESS'
-        ? { start: busy.start, end: busy.blockEnd }
-        : null;
+      return occupiesSchedule(busy.status) ? { start: busy.start, end: busy.blockEnd } : null;
     case 'hold':
       return busy.expiresAt > now ? { start: busy.start, end: busy.blockEnd } : null;
     case 'block':
