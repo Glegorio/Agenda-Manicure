@@ -6,6 +6,14 @@
 
 <!-- ENTRADAS -->
 
+## 2026-11-11 — 0.8 concluída
+
+- `.github/workflows/ci.yml`: Node via `.nvmrc`, pnpm via `packageManager`, Postgres 16.15 como
+  service (`agende_test` + extensões via psql) → format, lint, typecheck, test, build.
+- Primeiro push: `main` publicada no GitHub com todo o histórico; CI verde
+  (run 43036561189). actionlint sem achados.
+- Próximo: 0.9 (comandos reais no CLAUDE.md).
+
 ## 2026-11-11 — 0.7 concluída
 
 - Scripts raiz: `dev` (turbo persistente: api 3333, web 3000, Metro 8081), `build`, `lint`,
