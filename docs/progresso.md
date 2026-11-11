@@ -6,6 +6,17 @@
 
 <!-- ENTRADAS -->
 
+## 2026-11-11 — 1.5 concluída
+
+- `packages/money`: `isCents`/`assertCents` (normaliza -0), `formatBRL`/`formatBRLNumber`
+  (BigInt, exato em toda a faixa segura, saída idêntica ao Intl pt-BR, sem depender do Intl do
+  Hermes), `parseBRL` (sem float; recusa ambíguos/negativos/espaço interno), `centsFromDigits`
+  (máscara de digitação), `centsFromBigInt` (SUM do banco, Fase 7), `sumCents` (checa parciais).
+- 76 testes, cobertura 100%. Bugs pegos por teste: estouro intermediário na soma; -0 e erro de
+  1 centavo perto do limite (achados da revisão).
+- ⚠️ Fase 4: validar BigInt no Hermes num build Expo real. Validação `>= 0` (RN-10/52) fica no Zod (1.6).
+- Próximo: 1.6 `packages/contracts` (schemas Zod iniciais).
+
 ## 2026-11-11 — 1.4 concluída
 
 - Decisão de produto (RN-54 no doc 02): SCHEDULED → IN_PROGRESS/COMPLETED/NO_SHOW/CANCELLED;

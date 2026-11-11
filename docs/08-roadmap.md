@@ -29,7 +29,7 @@
 - [x] 1.2 `computeAvailableSlots()` — RN-30..36, TDD com casos T1..T10
 - [x] 1.3 Testes de propriedade (fast-check): nenhum slot retornado sobrepõe ocupado; todos cabem na janela
 - [x] 1.4 `canTransition(from, to)` + regras RN-50..54
-- [ ] 1.5 `packages/money` (centavos, `formatBRL`, parse seguro) + testes
+- [x] 1.5 `packages/money` (centavos, `formatBRL`, parse seguro) + testes
 - [ ] 1.6 `packages/contracts` com schemas Zod iniciais (service, schedule, availability, booking, errors)
 
 **Aceite:** cobertura ≥ 95% em `packages/scheduling`; todos os casos T1..T10 nomeados com o ID da regra.
