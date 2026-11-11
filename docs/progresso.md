@@ -6,6 +6,15 @@
 
 <!-- ENTRADAS -->
 
+## 2026-11-11 — 0.3 concluída
+
+- Compose: `postgres:16.15-alpine`, `TZ/PGTZ=UTC`, init SQL em `docker/postgres/init` cria `agende_test`
+  e extensões `btree_gist` + `citext` nos dois bancos.
+- Porta do host **5433** (`POSTGRES_PORT`): a máquina tem serviço `postgresql-x64-18` nativo na 5432.
+  `.env.example` (raiz e api) atualizados.
+- Verificado: dois bancos em UTC com as extensões; `tstzrange` ok.
+- Próximo: 0.4 (scaffold `apps/api` NestJS + `/health` + Prisma + Vitest).
+
 ## 2026-11-11 — 0.2 concluída
 
 - `.nvmrc` = 26, `.gitattributes` (LF), `.gitignore` ampliado, `core.longpaths` ativo.
