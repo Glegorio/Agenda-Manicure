@@ -34,9 +34,13 @@ function parseLocalTime(time: LocalTime): { hours: number; minutes: number } {
   return { hours, minutes };
 }
 
+const validTimeZones = new Set<TimeZone>();
+
 function assertTimeZone(timeZone: TimeZone): void {
-  // Intl lança RangeError para fuso IANA desconhecido.
+  if (validTimeZones.has(timeZone)) return;
+  // Intl lança RangeError para fuso IANA desconhecido. Cache: chamado milhares de vezes por consulta.
   new Intl.DateTimeFormat('en-US', { timeZone });
+  validTimeZones.add(timeZone);
 }
 
 const pad = (value: number, length = 2) => String(value).padStart(length, '0');
@@ -94,6 +98,16 @@ export function localDateOf(instant: Date, timeZone: TimeZone): LocalDate {
   assertTimeZone(timeZone);
   const zoned = new TZDate(instant.getTime(), timeZone);
   return `${pad(zoned.getFullYear(), 4)}-${pad(zoned.getMonth() + 1)}-${pad(zoned.getDate())}`;
+}
+
+/** Hora local (`HH:mm`) de um instante no fuso informado (RN-02). */
+export function localTimeOf(instant: Date, timeZone: TimeZone): LocalTime {
+  if (Number.isNaN(instant.getTime())) {
+    throw new RangeError('Instante inválido (Invalid Date).');
+  }
+  assertTimeZone(timeZone);
+  const zoned = new TZDate(instant.getTime(), timeZone);
+  return `${pad(zoned.getHours())}:${pad(zoned.getMinutes())}`;
 }
 
 /** Soma (ou subtrai) dias de calendário a uma data local. Independe de fuso. */

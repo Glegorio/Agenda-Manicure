@@ -6,6 +6,16 @@
 
 <!-- ENTRADAS -->
 
+## 2026-11-11 — 1.2 concluída
+
+- `computeAvailableSlots()` em `packages/scheduling/src/slots.ts` (RN-30..36, T1..T10 nomeados):
+  grade no relógio local (Q-16), encaixes RN-34 nos `blockEnd` ativos, buffer só no candidato,
+  horizonte/antecedência pela data local, valida parâmetros (step 0 travava em laço infinito).
+- Q-16 ampliada: cada horário local oferecido = um único instante (1ª ocorrência); slots
+  trafegam como instante UTC. 102 testes, cobertura 100% linhas / 98,9% branches.
+- Benchmark: 30 dias × step 5 ≈ 95 ms — considerar cache por dia na 2.7 (`availability/days`).
+- Próximo: 1.3 (propriedades com fast-check; lista sugerida pelo especialista no review da 1.2).
+
 ## 2026-11-11 — 1.1 concluída
 
 - `packages/scheduling`: tipos (`Interval`, `LocalWindow`, `BusyInterval` com `blockEnd` gravado,

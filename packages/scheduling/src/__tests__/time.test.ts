@@ -3,6 +3,7 @@ import {
   addLocalDays,
   intervalsOverlap,
   localDateOf,
+  localTimeOf,
   localTimeToInstant,
   resolveDayWindows,
   toLocalIntervals,
@@ -95,6 +96,21 @@ describe('localDateOf', () => {
 
   it('rejeita instante inválido', () => {
     expect(() => localDateOf(new Date(Number.NaN), SP)).toThrow(RangeError);
+  });
+});
+
+describe('localTimeOf', () => {
+  it('RN-02: hora local HH:mm de um instante em São Paulo', () => {
+    expect(localTimeOf(utc('2026-11-11T11:05:00Z'), SP)).toBe('08:05');
+  });
+
+  it('T8: as duas ocorrências de 01:30 em NY têm o mesmo rótulo local', () => {
+    expect(localTimeOf(utc('2026-11-01T05:30:00Z'), NY)).toBe('01:30');
+    expect(localTimeOf(utc('2026-11-01T06:30:00Z'), NY)).toBe('01:30');
+  });
+
+  it('rejeita instante inválido', () => {
+    expect(() => localTimeOf(new Date(Number.NaN), SP)).toThrow(RangeError);
   });
 });
 

@@ -26,7 +26,7 @@
 ## Fase 1 — Domínio de agenda (`packages/scheduling`)
 
 - [x] 1.1 Tipos de domínio (Window, BusyInterval, SlotQuery) e helpers de tempo com fuso (`@date-fns/tz`)
-- [ ] 1.2 `computeAvailableSlots()` — RN-30..36, TDD com casos T1..T10
+- [x] 1.2 `computeAvailableSlots()` — RN-30..36, TDD com casos T1..T10
 - [ ] 1.3 Testes de propriedade (fast-check): nenhum slot retornado sobrepõe ocupado; todos cabem na janela
 - [ ] 1.4 `canTransition(from, to)` + regras RN-50..54
 - [ ] 1.5 `packages/money` (centavos, `formatBRL`, parse seguro) + testes
