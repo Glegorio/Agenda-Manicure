@@ -1,4 +1,8 @@
-// Schema do Prisma. Models entram na tarefa 2.1 (docs/04-modelo-de-dados.md).
+// Schema do Prisma — referência humana em docs/04-modelo-de-dados.md (atualizar no mesmo PR).
+// Recursos que o Prisma não gera (extensões, exclusion constraint, CHECKs) vivem em SQL cru nas
+// migrations, escritas com `migrate dev --create-only` (ver .claude/rules/database.md).
+// Fase 2 cria só as tabelas que usa (Q-18); despesas, fechamento, tags, logs e push vêm depois.
+
 generator client {
   provider = "prisma-client"
   output   = "../src/generated/prisma"
@@ -6,4 +10,287 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+}
+
+enum ThemePalette {
+  ROSE_GOLD
+  NUDE_MINIMAL
+  ELEGANCE_BLACK
+  PASTEL_LILAC
+}
+
+enum ThemeMode {
+  LIGHT
+  DARK
+  SYSTEM
+}
+
+/// RN-50
+enum AppointmentStatus {
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+enum AppointmentSource {
+  WEB
+  APP
+}
+
+enum PaymentMethod {
+  PIX
+  CREDIT_CARD
+  DEBIT_CARD
+  CASH
+}
+
+/// RN-53
+enum CancelledBy {
+  PROFESSIONAL
+  CLIENT
+}
+
+enum ClientSource {
+  WEB
+  MANUAL
+  CONTACT_IMPORT
+}
+
+model Professional {
+  id                           String       @id @default(uuid(7)) @db.Uuid
+  email                        String       @unique @db.Citext
+  passwordHash                 String       @map("password_hash")
+  businessName                 String       @map("business_name")
+  /// RN-90; nulo até o onboarding (Q-21)
+  slug                         String?      @unique @db.Citext
+  /// IANA (RN-02)
+  timezone                     String       @default("America/Sao_Paulo")
+  addressLine                  String?      @map("address_line")
+  city                         String?
+  state                        String?
+  zip                          String?
+  lat                          Float?
+  lng                          Float?
+  logoUrl                      String?      @map("logo_url")
+  coverUrl                     String?      @map("cover_url")
+  themePalette                 ThemePalette @default(ROSE_GOLD) @map("theme_palette")
+  themeMode                    ThemeMode    @default(SYSTEM) @map("theme_mode")
+  /// RN-22
+  bufferMin                    Int          @default(10) @map("buffer_min") @db.SmallInt
+  /// RN-23
+  slotStepMin                  Int          @default(15) @map("slot_step_min") @db.SmallInt
+  /// RN-24, Q-08
+  minNoticeMin                 Int          @default(120) @map("min_notice_min")
+  /// RN-25, Q-08
+  bookingHorizonDays           Int          @default(30) @map("booking_horizon_days") @db.SmallInt
+  /// RN-92
+  cancellationPolicy           String?      @map("cancellation_policy")
+  whatsappConfirmationTemplate String?      @map("whatsapp_confirmation_template")
+  /// RN-60
+  closingReminderOffsetMin     Int          @default(30) @map("closing_reminder_offset_min") @db.SmallInt
+  createdAt                    DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt                    DateTime     @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  refreshTokens      RefreshToken[]
+  services           Service[]
+  weeklyWindows      WeeklyScheduleWindow[]
+  scheduleExceptions ScheduleException[]
+  clients            Client[]
+  appointments       Appointment[]
+  slotHolds          SlotHold[]
+  manualBlocks       ManualBlock[]
+
+  @@map("professionals")
+}
+
+/// Refresh opaco rotativo, guardado só como hash (ADR-0009, a escrever na tarefa 2.3).
+model RefreshToken {
+  id             String    @id @default(uuid(7)) @db.Uuid
+  professionalId String    @map("professional_id") @db.Uuid
+  tokenHash      String    @unique @map("token_hash")
+  /// Rotação: reuso de um token antigo revoga a família inteira.
+  familyId       String    @map("family_id") @db.Uuid
+  expiresAt      DateTime  @map("expires_at") @db.Timestamptz(3)
+  revokedAt      DateTime? @map("revoked_at") @db.Timestamptz(3)
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt      DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  professional Professional @relation(fields: [professionalId], references: [id], onDelete: Cascade)
+
+  @@index([professionalId])
+  @@index([familyId])
+  @@map("refresh_tokens")
+}
+
+/// RN-10..12
+model Service {
+  id             String   @id @default(uuid(7)) @db.Uuid
+  professionalId String   @map("professional_id") @db.Uuid
+  name           String
+  category       String
+  description    String?
+  imageUrl       String?  @map("image_url")
+  priceCents     Int      @map("price_cents")
+  durationMin    Int      @map("duration_min") @db.SmallInt
+  active         Boolean  @default(true)
+  public         Boolean  @default(true)
+  sortOrder      Int      @default(0) @map("sort_order")
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  professional Professional  @relation(fields: [professionalId], references: [id], onDelete: Cascade)
+  appointments Appointment[]
+  slotHolds    SlotHold[]
+
+  @@unique([id, professionalId])
+  @@index([professionalId, sortOrder])
+  @@map("services")
+}
+
+/// RN-20; weekday 0=dom..6=sáb
+model WeeklyScheduleWindow {
+  id             String   @id @default(uuid(7)) @db.Uuid
+  professionalId String   @map("professional_id") @db.Uuid
+  weekday        Int      @db.SmallInt
+  /// Minutos desde a meia-noite local (0–1439); `time` do Prisma perde 24:00
+  startMin       Int      @map("start_min") @db.SmallInt
+  /// Minutos desde a meia-noite local (1–1440); 1440 = 24:00 (Q-15)
+  endMin         Int      @map("end_min") @db.SmallInt
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  professional Professional @relation(fields: [professionalId], references: [id], onDelete: Cascade)
+
+  @@index([professionalId, weekday])
+  @@map("weekly_schedule_windows")
+}
+
+/// RN-21
+model ScheduleException {
+  id             String   @id @default(uuid(7)) @db.Uuid
+  professionalId String   @map("professional_id") @db.Uuid
+  date           DateTime @db.Date
+  closed         Boolean
+  note           String?
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  professional Professional      @relation(fields: [professionalId], references: [id], onDelete: Cascade)
+  windows      ExceptionWindow[]
+
+  @@unique([professionalId, date])
+  @@map("schedule_exceptions")
+}
+
+model ExceptionWindow {
+  id          String   @id @default(uuid(7)) @db.Uuid
+  exceptionId String   @map("exception_id") @db.Uuid
+  /// Minutos desde a meia-noite local (0–1439); `time` do Prisma perde 24:00
+  startMin    Int      @map("start_min") @db.SmallInt
+  /// Minutos desde a meia-noite local (1–1440); 1440 = 24:00 (Q-15)
+  endMin      Int      @map("end_min") @db.SmallInt
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  exception ScheduleException @relation(fields: [exceptionId], references: [id], onDelete: Cascade)
+
+  @@index([exceptionId])
+  @@map("exception_windows")
+}
+
+/// RN-80..83
+model Client {
+  id                 String       @id @default(uuid(7)) @db.Uuid
+  professionalId     String       @map("professional_id") @db.Uuid
+  name               String
+  /// E.164 (RN-80)
+  phoneE164          String       @map("phone_e164")
+  notes              String?
+  source             ClientSource
+  consentMarketingAt DateTime?    @map("consent_marketing_at") @db.Timestamptz(3)
+  createdAt          DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt          DateTime     @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  professional Professional  @relation(fields: [professionalId], references: [id], onDelete: Cascade)
+  appointments Appointment[]
+
+  @@unique([id, professionalId])
+  @@unique([professionalId, phoneE164])
+  @@map("clients")
+}
+
+/// RN-11 (snapshot), RN-42 (exclusion constraint em SQL cru), RN-50..53
+model Appointment {
+  id                  String            @id @default(uuid(7)) @db.Uuid
+  professionalId      String            @map("professional_id") @db.Uuid
+  clientId            String            @map("client_id") @db.Uuid
+  /// Nulo se o serviço for apagado; o snapshot é a fonte (RN-11)
+  serviceId           String?           @map("service_id") @db.Uuid
+  serviceNameSnapshot String            @map("service_name_snapshot")
+  priceCentsSnapshot  Int               @map("price_cents_snapshot")
+  durationMinSnapshot Int               @map("duration_min_snapshot") @db.SmallInt
+  startAt             DateTime          @map("start_at") @db.Timestamptz(3)
+  endAt               DateTime          @map("end_at") @db.Timestamptz(3)
+  /// end_at + buffer vigente na criação (RN-42)
+  blockEndAt          DateTime          @map("block_end_at") @db.Timestamptz(3)
+  status              AppointmentStatus @default(SCHEDULED)
+  source              AppointmentSource
+  clientNotes         String?           @map("client_notes")
+  paidCents           Int?              @map("paid_cents")
+  paymentMethod       PaymentMethod?    @map("payment_method")
+  cancelledBy         CancelledBy?      @map("cancelled_by")
+  cancelReason        String?           @map("cancel_reason")
+  statusChangedAt     DateTime          @default(now()) @map("status_changed_at") @db.Timestamptz(3)
+  createdAt           DateTime          @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt           DateTime          @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  professional Professional @relation(fields: [professionalId], references: [id], onDelete: Cascade)
+  /// FK composta: a cliente é da mesma profissional (regra 5, defesa no banco)
+  client       Client       @relation(fields: [clientId, professionalId], references: [id, professionalId], onDelete: Restrict)
+  service      Service?     @relation(fields: [serviceId], references: [id], onDelete: SetNull)
+
+  @@index([professionalId, startAt])
+  @@index([professionalId, status, startAt])
+  @@index([clientId, professionalId])
+  @@index([serviceId])
+  @@map("appointments")
+}
+
+/// RN-40..46; sem exclusion constraint (validade depende de now(), ADR-0003)
+model SlotHold {
+  id             String   @id @default(uuid(7)) @db.Uuid
+  professionalId String   @map("professional_id") @db.Uuid
+  serviceId      String   @map("service_id") @db.Uuid
+  startAt        DateTime @map("start_at") @db.Timestamptz(3)
+  endAt          DateTime @map("end_at") @db.Timestamptz(3)
+  blockEndAt     DateTime @map("block_end_at") @db.Timestamptz(3)
+  /// sha256 do token opaco; o token em si nunca é gravado
+  tokenHash      String   @unique @map("token_hash")
+  expiresAt      DateTime @map("expires_at") @db.Timestamptz(3)
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  professional Professional @relation(fields: [professionalId], references: [id], onDelete: Cascade)
+  /// FK composta: o serviço é da mesma profissional (regra 5, defesa no banco)
+  service      Service      @relation(fields: [serviceId, professionalId], references: [id, professionalId], onDelete: Cascade)
+
+  @@index([professionalId, expiresAt])
+  @@index([serviceId, professionalId])
+  @@map("slot_holds")
+}
+
+model ManualBlock {
+  id             String   @id @default(uuid(7)) @db.Uuid
+  professionalId String   @map("professional_id") @db.Uuid
+  startAt        DateTime @map("start_at") @db.Timestamptz(3)
+  endAt          DateTime @map("end_at") @db.Timestamptz(3)
+  reason         String?
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  professional Professional @relation(fields: [professionalId], references: [id], onDelete: Cascade)
+
+  @@index([professionalId, startAt])
+  @@map("manual_blocks")
 }

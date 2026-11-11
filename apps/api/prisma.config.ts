@@ -1,9 +1,9 @@
 import 'dotenv/config';
 import { defineConfig } from 'prisma/config';
 
-// Só `generate`/`validate` dispensam banco; qualquer outro comando exige DATABASE_URL explícito
+// Só `generate`/`validate`/`format` dispensam banco; qualquer outro comando exige DATABASE_URL explícito
 // (evita que um `migrate` sem variável caia silenciosamente no banco de dev).
-const offlineCommand = ['generate', 'validate'].some((cmd) => process.argv.includes(cmd));
+const offlineCommand = ['generate', 'validate', 'format'].some((cmd) => process.argv.includes(cmd));
 const url =
   process.env['DATABASE_URL'] ??
   (offlineCommand ? 'postgresql://offline@localhost:5433/offline' : undefined);
@@ -13,6 +13,6 @@ if (url === undefined) {
 
 export default defineConfig({
   schema: 'prisma/schema.prisma',
-  migrations: { path: 'prisma/migrations' },
+  migrations: { path: 'prisma/migrations', seed: 'node prisma/seed.ts' },
   datasource: { url },
 });

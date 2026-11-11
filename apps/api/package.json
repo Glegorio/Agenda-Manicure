@@ -13,7 +13,9 @@
     "test:watch": "vitest",
     "db:generate": "prisma generate",
     "prisma": "prisma",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "db:seed": "prisma db seed",
+    "db:migrate": "prisma migrate deploy"
   },
   "dependencies": {
     "@agende/contracts": "workspace:*",

@@ -6,6 +6,18 @@
 
 <!-- ENTRADAS -->
 
+## 2026-11-11 — 2.1 concluída
+
+- Schema Prisma (Q-18: tabelas da Fase 2 + `refresh_tokens`) e migration `init` com SQL cru:
+  extensões, `appointments_no_overlap` (RN-42), EXCLUDE de janelas sobrepostas (Q-17), CHECKs
+  (RN-10/22..25/52/53/80/90), FKs compostas por profissional (regra 5). Seed `demo` idempotente.
+- Janelas em **minutos** (`start_min`/`end_min`, 0–1440): `time` + Prisma perdia o `24:00`.
+- Prisma 7 + adapter-pg: violação vem como `P2039`/`P2002`; SQLSTATE em
+  `meta.driverAdapterError.cause.originalCode` → `postgresErrorCode()` (src/prisma/postgres-error.ts).
+- `globalSetup` aplica migrations só em banco `*_test`; arquivos em série (ADR-0010). 32 testes de banco.
+- Prisma 7 não roda `generate` no `migrate dev`: após mudar o schema, `pnpm db:generate`.
+- Próximo: 2.2 (infra de testes: factories, Clock, PrismaService, TRUNCATE por teste).
+
 ## 2026-11-11 — 1.6 concluída · Fase 1 encerrada
 
 - `packages/contracts` (Zod 4): primitivos (data/hora local, instante UTC, fuso IANA canônico,

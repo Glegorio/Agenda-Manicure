@@ -36,7 +36,7 @@
 
 ## Fase 2 — Backend core
 
-- [ ] 2.1 Schema Prisma (doc 04) + migration inicial + SQL cru da exclusion constraint
+- [x] 2.1 Schema Prisma (doc 04) + migration inicial + SQL cru da exclusion constraint
 - [ ] 2.2 Infra de teste de integração (Postgres real via docker/Testcontainers, reset por teste)
 - [ ] 2.2b Pipe Zod único, envelope de erro padrão e mensagens PT-BR (antecipado da 2.10, Q-18)
 - [ ] 2.3 Módulo `auth` (registro, login, refresh, argon2id) + guard + escopo por `professional_id`

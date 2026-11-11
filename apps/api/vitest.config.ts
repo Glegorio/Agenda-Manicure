@@ -11,6 +11,9 @@ export default defineConfig({
   ssr: { resolve: { conditions, externalConditions: ['@agende/source'] } },
   test: {
     include: ['src/**/*.test.ts'],
+    globalSetup: ['./test/global-setup.ts'],
+    // Testes de integração compartilham o banco agende_test: arquivos em série (ADR-0010).
+    fileParallelism: false,
     env: { TZ: 'UTC' },
   },
 });
