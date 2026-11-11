@@ -1,6 +1,7 @@
 # Contratos da API (REST, JSON)
 
-> Fonte de verdade executável: schemas Zod em `packages/contracts`.
+> Fonte de verdade executável: schemas Zod em `packages/contracts` (common, errors, service,
+> schedule, availability, booking — tarefa 1.6; auth, clientes, relatórios entram nas fases 2–7).
 > Este documento é o índice humano. Mudou um endpoint? Atualize os dois no mesmo PR.
 
 ## Convenções
@@ -44,29 +45,29 @@ Códigos de erro de domínio (sempre `UPPER_SNAKE`):
 
 ## Profissional (auth)
 
-| Método    | Rota                                                    | Descrição                                    |
-| --------- | ------------------------------------------------------- | -------------------------------------------- |
-| POST      | `/v1/auth/register` · `/login` · `/refresh` · `/logout` | Autenticação                                 |
-| GET/PATCH | `/v1/me`                                                | Perfil, tema, timezone, parâmetros de agenda |
-| GET       | `/v1/me/slug-availability?slug=`                        | Checa slug                                   |
-| CRUD      | `/v1/services`                                          | Serviços                                     |
-| GET/PUT   | `/v1/schedule/weekly`                                   | Escala semanal (substitui o conjunto)        |
-| CRUD      | `/v1/schedule/exceptions`                               | Folgas/datas especiais                       |
-| CRUD      | `/v1/blocks`                                            | Bloqueios manuais                            |
-| GET       | `/v1/appointments?from=&to=`                            | Agenda (dia/semana)                          |
-| POST      | `/v1/appointments`                                      | Agendamento manual                           |
-| POST      | `/v1/appointments/:id/transitions`                      | `{to, paymentMethod?, paidCents?, reason?}`  |
-| GET       | `/v1/appointments/stream`                               | SSE: `appointment.created/updated`           |
-| GET       | `/v1/closures/:date`                                    | Pendentes + totais do dia                    |
-| POST      | `/v1/closures/:date`                                    | Fecha o dia (lote de transições + despesas)  |
-| CRUD      | `/v1/expenses`                                          | Despesas                                     |
-| CRUD      | `/v1/clients`                                           | CRM                                          |
-| POST      | `/v1/clients/import`                                    | Lote de `{name, phone}` selecionados no app  |
-| GET       | `/v1/reports/summary?period=day                         | week                                         | month | year&date=` | KPIs (RN-70..77) |
-| GET       | `/v1/reports/services?from=&to=`                        | Ranking de serviços                          |
-| GET       | `/v1/reports/cashflow?from=&to=`                        | Entradas por método − despesas               |
-| POST      | `/v1/push-tokens`                                       | Registra token Expo                          |
-| POST      | `/v1/invites/preview`                                   | Renderiza mensagem de convite com link       |
+| Método    | Rota                                                    | Descrição                                                     |
+| --------- | ------------------------------------------------------- | ------------------------------------------------------------- |
+| POST      | `/v1/auth/register` · `/login` · `/refresh` · `/logout` | Autenticação                                                  |
+| GET/PATCH | `/v1/me`                                                | Perfil, tema, timezone, parâmetros de agenda                  |
+| GET       | `/v1/me/slug-availability?slug=`                        | Checa slug                                                    |
+| CRUD      | `/v1/services`                                          | Serviços                                                      |
+| GET/PUT   | `/v1/schedule/weekly`                                   | Escala semanal (substitui o conjunto)                         |
+| CRUD      | `/v1/schedule/exceptions`                               | Folgas/datas especiais                                        |
+| CRUD      | `/v1/blocks`                                            | Bloqueios manuais                                             |
+| GET       | `/v1/appointments?from=&to=`                            | Agenda (dia/semana)                                           |
+| POST      | `/v1/appointments`                                      | Agendamento manual                                            |
+| POST      | `/v1/appointments/:id/transitions`                      | `{to, paymentMethod?, paidCents?, reason?}`                   |
+| GET       | `/v1/appointments/stream`                               | SSE: `appointment.created/updated`                            |
+| GET       | `/v1/closures/:date`                                    | Pendentes + totais do dia                                     |
+| POST      | `/v1/closures/:date`                                    | Fecha o dia (lote de transições + despesas)                   |
+| CRUD      | `/v1/expenses`                                          | Despesas                                                      |
+| CRUD      | `/v1/clients`                                           | CRM                                                           |
+| POST      | `/v1/clients/import`                                    | Lote de `{name, phone}` selecionados no app                   |
+| GET       | `/v1/reports/summary?period=&date=`                     | KPIs (RN-70..77); `period` = `day`, `week`, `month` ou `year` |
+| GET       | `/v1/reports/services?from=&to=`                        | Ranking de serviços                                           |
+| GET       | `/v1/reports/cashflow?from=&to=`                        | Entradas por método − despesas                                |
+| POST      | `/v1/push-tokens`                                       | Registra token Expo                                           |
+| POST      | `/v1/invites/preview`                                   | Renderiza mensagem de convite com link                        |
 
 Transições (`POST /v1/appointments/:id/transitions`, RN-52..54, domínio em `@agende/scheduling`):
 

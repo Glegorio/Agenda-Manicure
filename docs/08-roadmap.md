@@ -5,7 +5,7 @@
 > `/registrar-progresso` ao fim de cada sessão. Marque `[x]` somente quando os critérios de
 > aceite da tarefa passarem (testes verdes + lint + typecheck).
 
-**Fase atual:** 1
+**Fase atual:** 2
 
 ---
 
@@ -30,7 +30,7 @@
 - [x] 1.3 Testes de propriedade (fast-check): nenhum slot retornado sobrepõe ocupado; todos cabem na janela
 - [x] 1.4 `canTransition(from, to)` + regras RN-50..54
 - [x] 1.5 `packages/money` (centavos, `formatBRL`, parse seguro) + testes
-- [ ] 1.6 `packages/contracts` com schemas Zod iniciais (service, schedule, availability, booking, errors)
+- [x] 1.6 `packages/contracts` com schemas Zod iniciais (service, schedule, availability, booking, errors)
 
 **Aceite:** cobertura ≥ 95% em `packages/scheduling`; todos os casos T1..T10 nomeados com o ID da regra.
 

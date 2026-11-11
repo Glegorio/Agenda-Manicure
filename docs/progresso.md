@@ -6,6 +6,18 @@
 
 <!-- ENTRADAS -->
 
+## 2026-11-11 — 1.6 concluída · Fase 1 encerrada
+
+- `packages/contracts` (Zod 4): primitivos (data/hora local, instante UTC, fuso IANA canônico,
+  centavos ≤ int4, E.164), erros (envelope + status HTTP), serviço, escala/exceções/bloqueios
+  (Q-17 sem sobreposição), parâmetros de agenda, disponibilidade (slots UTC, Q-16), hold/reserva,
+  transições (união por destino; `cancelledBy` fora do body). 82 testes, cobertura 100%.
+- `configureContractsLocale()` (mensagens Zod em PT-BR) — chamar na inicialização de API/web/app.
+- `sideEffects: false` em scheduling/money/contracts (tree-shaking da web, orçamento 120 KB).
+- Pendente para 2.7/2.8/3.x: schemas de resposta de reserva, perfil público (RN-92),
+  agendamento/agendamento manual; pipe Zod único na API (ZodError → VALIDATION_ERROR).
+- Aceite da Fase 1 ok: scheduling com 100% de cobertura e T1..T10 nomeados. Fase atual → 2.
+
 ## 2026-11-11 — 1.5 concluída
 
 - `packages/money`: `isCents`/`assertCents` (normaliza -0), `formatBRL`/`formatBRLNumber`
