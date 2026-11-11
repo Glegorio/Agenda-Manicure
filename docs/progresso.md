@@ -6,6 +6,15 @@
 
 <!-- ENTRADAS -->
 
+## 2026-11-11 — 0.4 concluída
+
+- `apps/api`: NestJS 12 (ESM), `GET /health` (liveness, fora de `/v1`) com teste e2e Supertest.
+- Prisma 7.10 sem models, client em `src/generated` (postinstall + task `db:generate` no Turbo).
+- Vitest 5 + `unplugin-swc`; condição `@agende/source` validada (teste passa sem `dist`).
+- ADR-0006 registra ESM/Nest 12/Prisma 7/SWC. `allowBuilds` do pnpm: prisma, @prisma/engines, @swc/core.
+- Pendência do revisor: 🔴 deny de `.env.*` em `.claude/settings.json` (decisão do usuário).
+- Próximo: 0.5 (scaffold `apps/web`; ADR de estilização = CSS Modules vira ADR-0007).
+
 ## 2026-11-11 — 0.3 concluída
 
 - Compose: `postgres:16.15-alpine`, `TZ/PGTZ=UTC`, init SQL em `docker/postgres/init` cria `agende_test`

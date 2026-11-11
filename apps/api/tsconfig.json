@@ -1,0 +1,10 @@
+{
+  "extends": "@agende/config/tsconfig/base.json",
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "sourceMap": true,
+    "types": ["node"]
+  },
+  "include": ["src", "prisma.config.ts", "vitest.config.ts"]
+}

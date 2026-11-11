@@ -1,0 +1,9 @@
+// Schema do Prisma. Models entram na tarefa 2.1 (docs/04-modelo-de-dados.md).
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}

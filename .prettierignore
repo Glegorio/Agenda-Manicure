@@ -6,3 +6,4 @@ coverage/
 .next/
 .expo/
 docs/00-especificacao-original.md
+apps/api/src/generated/

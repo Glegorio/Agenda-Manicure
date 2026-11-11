@@ -3,3 +3,9 @@ packages:
   - packages/*
 minimumReleaseAgeExclude:
   - prettier@3.10.0
+
+# pnpm só executa scripts de instalação dos pacotes listados aqui.
+allowBuilds:
+  '@prisma/engines': true
+  '@swc/core': true
+  prisma: true

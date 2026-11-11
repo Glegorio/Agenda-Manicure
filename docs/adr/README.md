@@ -12,6 +12,7 @@ Crie um novo com `/adr <título>`.
 | 0003 | [Concorrência de agenda: hold + exclusion constraint + advisory lock](0003-concorrencia-agenda.md) | aceito |
 | 0004 | [Integração WhatsApp em fases](0004-whatsapp.md) | proposto |
 | 0005 | [Estratégia de pacotes internos](0005-pacotes-internos.md) | aceito |
+| 0006 | [API em ESM com NestJS 12, Prisma 7 e Vitest + SWC](0006-api-esm-nest-prisma.md) | aceito |
 
 ## Template
 
