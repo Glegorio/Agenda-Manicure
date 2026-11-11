@@ -123,7 +123,17 @@ parâmetro). Ver `.claude/rules/scheduling.md`.
 - **RN-52** — `COMPLETED` exige forma de pagamento e valor recebido (`paid_cents`,
   padrão = `price_cents` do snapshot, editável para desconto/acréscimo).
 - **RN-53** — Cancelamento guarda `cancelled_by` (`PROFESSIONAL` | `CLIENT`) e motivo opcional.
-- **RN-54** — Transições inválidas retornam `422 INVALID_TRANSITION`.
+- **RN-54** — Transições permitidas (qualquer outra retorna `422 INVALID_TRANSITION`):
+
+  | De            | Para                                               |
+  | ------------- | -------------------------------------------------- |
+  | `SCHEDULED`   | `IN_PROGRESS`, `COMPLETED`, `NO_SHOW`, `CANCELLED` |
+  | `IN_PROGRESS` | `COMPLETED`, `CANCELLED`                           |
+
+  `COMPLETED`, `NO_SHOW` e `CANCELLED` são finais. `SCHEDULED → COMPLETED` direto existe para o
+  fechamento do dia (RN-61), sem obrigar a profissional a "iniciar" antes. A tabela prevalece
+  sobre o diagrama acima.
+
 - **RN-55** — Cores na Agenda Hub: Agendado = cor primária do tema; Em andamento = âmbar;
   Concluído = verde; Cancelado = cinza riscado; Falta = vermelho. (Tokens em design system.)
 
