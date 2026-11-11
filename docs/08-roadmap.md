@@ -5,7 +5,7 @@
 > `/registrar-progresso` ao fim de cada sessão. Marque `[x]` somente quando os critérios de
 > aceite da tarefa passarem (testes verdes + lint + typecheck).
 
-**Fase atual:** 0
+**Fase atual:** 1
 
 ---
 
@@ -19,7 +19,7 @@
 - [x] 0.6 Scaffold `apps/mobile` (Expo, Expo Router, TS) com tela placeholder
 - [x] 0.7 Scripts raiz: `pnpm dev`, `pnpm test`, `pnpm lint`, `pnpm typecheck`, `pnpm build`
 - [x] 0.8 CI (GitHub Actions): install → lint → typecheck → test (com serviço Postgres)
-- [ ] 0.9 Atualizar seção "Comandos" do `CLAUDE.md` com os comandos reais
+- [x] 0.9 Atualizar seção "Comandos" do `CLAUDE.md` com os comandos reais
 
 **Aceite:** `pnpm i && docker compose up -d && pnpm test && pnpm lint && pnpm typecheck` verdes num clone limpo.
 

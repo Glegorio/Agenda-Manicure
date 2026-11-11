@@ -24,7 +24,7 @@ claude
 /registrar-progresso   # ao final da sessão
 ```
 
-Pré-requisitos na sua máquina: Node LTS, pnpm, Docker (para o Postgres), Git e o Claude Code.
+Pré-requisitos na sua máquina: Node 26 (`.nvmrc`), pnpm 12 (via corepack), Docker (para o Postgres), Git e o Claude Code. Comandos do dia a dia: seção "Comandos" do `CLAUDE.md`.
 `jq` é opcional (os hooks usam `node` ou `python3` se `jq` não existir).
 
 ## Ciclo de trabalho recomendado

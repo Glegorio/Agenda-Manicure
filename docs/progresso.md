@@ -6,6 +6,14 @@
 
 <!-- ENTRADAS -->
 
+## 2026-11-11 — 0.9 concluída · Fase 0 encerrada
+
+- `CLAUDE.md`: seção "Comandos" com os comandos reais (portas, `.env.example` por app, Prisma
+  exige `DATABASE_URL`) e "Stack" com versões reais; README com pré-requisitos.
+- Aceite da fase verificado em **clone limpo**: `pnpm i --frozen-lockfile`, `docker compose up`,
+  test, lint, typecheck, build, format:check — todos verdes. CI verde no GitHub.
+- Fase atual → 1. Próximo: `/iniciar-fase 1` (domínio `packages/scheduling`).
+
 ## 2026-11-11 — 0.8 concluída
 
 - `.github/workflows/ci.yml`: Node via `.nvmrc`, pnpm via `packageManager`, Postgres 16.15 como

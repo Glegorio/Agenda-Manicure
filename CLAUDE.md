@@ -16,20 +16,27 @@ Consulte sob demanda (não carregados automaticamente):
 
 ## Comandos
 
-> ⚠️ Preenchidos de verdade na tarefa 0.9. Até lá, são o alvo esperado.
+Requisitos: Node 26 (`.nvmrc`), pnpm 12 (via `packageManager`; `npm i -g corepack && corepack enable`),
+Docker. Primeira vez: copie cada `apps/*/.env.example` para o arquivo local do app (o usuário faz isso;
+o Claude não lê nem cria esses arquivos).
 
 ```bash
-pnpm install
-docker compose up -d            # Postgres local
-pnpm dev                        # todos os apps
-pnpm --filter api dev           # só a API
-pnpm --filter web dev
-pnpm --filter mobile start      # Expo
-pnpm test                       # todos os testes
-pnpm --filter scheduling test   # um pacote
+pnpm install                    # também gera o client do Prisma (postinstall)
+docker compose up -d --wait     # Postgres 16 em localhost:5433 (bancos agende e agende_test)
+pnpm dev                        # api :3333 · web :3000 · Metro :8081
+pnpm --filter api dev           # só a API (nest start --watch)
+pnpm --filter web dev           # só a web (Next/Turbopack)
+pnpm --filter mobile start      # só o Expo
+pnpm test                       # todos os testes (Turbo)
+pnpm --filter @agende/contracts test   # um pacote (nome do package.json)
 pnpm lint && pnpm typecheck
-pnpm --filter api prisma migrate dev --name <nome>
+pnpm build
+pnpm format                     # Prettier (format:check roda na CI)
+pnpm db:generate                # regenera o client do Prisma
+pnpm --filter api prisma migrate dev --name <nome>   # exige DATABASE_URL
 ```
+
+CI: `.github/workflows/ci.yml` (format → lint → typecheck → test → build, Postgres como service).
 
 ## Regras inegociáveis
 
@@ -87,11 +94,13 @@ Uma tarefa do roadmap por vez. Não expanda o escopo sem perguntar.
 - Commits: Conventional Commits em PT-BR — `feat(api): cria hold de 5 minutos (RN-40)`.
 - Nunca `git push --force` em `main`. Não faça commit/push sem o usuário pedir.
 
-## Stack (atualizar versões na tarefa 0.9)
+## Stack
 
-Node LTS · pnpm · Turborepo · TypeScript strict · NestJS · Prisma · PostgreSQL 16 ·
-Next.js (App Router) · Expo + Expo Router · TanStack Query · Zod · date-fns + @date-fns/tz ·
-pg-boss · Vitest · Playwright · jest-expo · fast-check · Lucide.
+Node 26 · pnpm 12 · Turborepo 2 · TypeScript 6.0 (strict) · ESLint 10 · Prettier 3 ·
+NestJS 12 (ESM) · Prisma 7 · PostgreSQL 16 · Next.js 16 (App Router, Turbopack, CSS Modules) ·
+Expo SDK 58 + Expo Router · React 19.3 · Zod 4 · Vitest 5 · jest-expo 58 · TanStack Query ·
+date-fns + @date-fns/tz · pg-boss · Playwright · fast-check · Lucide (de TanStack Query em diante,
+ainda não instalados). Decisões: ADR-0001, 0005–0008.
 
 Pacotes internos `@agende/*`: ESM compilado em `dist/` + condição `@agende/source` (alias no Next) para a
 fonte TS; imports relativos com `.ts` (ADR-0005, ADR-0007). TypeScript fixado em `~6.0`.
