@@ -48,6 +48,9 @@ Entrada: profissional, serviço (duração `D`), data local `d`, agora `now`.
    - agendamentos com status `SCHEDULED` ou `IN_PROGRESS` → `[start, end + buffer)`;
    - holds ativos (`expires_at > now`) → `[start, end + buffer)`;
    - bloqueios manuais da profissional → `[start, end)`.
+   - Em agendamentos e holds, `end + buffer` é o `block_end_at` **gravado** na criação (doc 04),
+     o mesmo valor usado pela exclusion constraint (RN-42) — nunca recalculado com o buffer atual.
+     O `buffer` vigente só se aplica ao candidato novo (RN-31).
 3. Para cada janela `[W0, W1)`, gere inícios candidatos `t = W0, W0+step, W0+2·step, …`.
 4. Um candidato `t` é **válido** se e somente se:
    - **RN-30** `t + D ≤ W1` (o serviço cabe inteiro na janela; não atravessa pausa).
