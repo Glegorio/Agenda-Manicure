@@ -1,0 +1,36 @@
+{
+  "name": "@agende/scheduling",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "@agende/source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "@date-fns/tz": "^1.5.0",
+    "date-fns": "^4.4.0"
+  },
+  "devDependencies": {
+    "@agende/config": "workspace:*",
+    "@vitest/coverage-v8": "^5.1.0",
+    "eslint": "^10.14.0",
+    "fast-check": "^4.10.2",
+    "typescript": "~6.0.3",
+    "vitest": "^5.1.0"
+  }
+}

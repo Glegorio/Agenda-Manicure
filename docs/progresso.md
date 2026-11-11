@@ -6,6 +6,17 @@
 
 <!-- ENTRADAS -->
 
+## 2026-11-11 — 1.1 concluída
+
+- `packages/scheduling`: tipos (`Interval`, `LocalWindow`, `BusyInterval` com `blockEnd` gravado,
+  `SlotQuery`, `SchedulingSettings`) e helpers com `@date-fns/tz` (`localTimeToInstant`,
+  `localDateOf`, `addLocalDays`, `weekdayOf`, `resolveDayWindows`, `toLocalIntervals`,
+  `intervalsOverlap`). 46 testes, cobertura 100% linhas / 97% branches; processo em TZ Tóquio.
+- DST: Q-15 (hora inexistente → fim do salto; ambígua → 1ª ocorrência, inclusive saltos de 30 min).
+- Docs: RN-31/34 esclarecem que `end + buffer` = `block_end_at` gravado; RN-20 ganhou a decisão
+  de produto Q-17 (janelas encostadas/sobrepostas viram uma só). Q-16 (grade local) provisória.
+- Próximo: 1.2 `computeAvailableSlots()` (T1..T10), seguindo Q-16.
+
 ## 2026-11-11 — 0.9 concluída · Fase 0 encerrada
 
 - `CLAUDE.md`: seção "Comandos" com os comandos reais (portas, `.env.example` por app, Prisma
