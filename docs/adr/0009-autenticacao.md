@@ -46,7 +46,9 @@ vindo do token (regra 5). A tabela `refresh_tokens` já existe desde a 2.1.
   SaaS B2B, aceita pela UX do cadastro). Mitigação obrigatória na 2.10: rate limit forte em
   `/register` e `/login`. Confirmação por e-mail (resposta genérica) só quando houver verificação
   de e-mail (fora da Fase 2, Q-22).
-- Rate limit de login/registro e limpeza de refresh tokens expirados ficam para a 2.10.
+- 2.10: rate limit de login/registro/refresh (10/min por IP, Q-31; guard próprio em memória, sem
+  `@nestjs/throttler`, para usar o `Clock` e o envelope de erro) e limpeza de refresh tokens
+  vencidos pelo job pg-boss (perde só o sinal de reuso de token já vencido).
 - Rotação, reuso e logout rodam numa transação com `pg_advisory_xact_lock` por família; o
   `401` de reuso só é devolvido depois do commit da revogação.
 - Trocar `JWT_ACCESS_SECRET` derruba todos os access tokens (os refresh continuam valendo).

@@ -40,6 +40,8 @@ erros inesperados viram `500 INTERNAL_ERROR` sem expor a mensagem interna.
 
 ## Público (booking web, sem auth)
 
+Rate limit por IP + slug, janela fixa de 1 min (Q-25): leituras 60/min; holds, liberar hold e reservas 10/min. Estourou → `429 RATE_LIMITED` com `Retry-After` (segundos) e `details.retryAfterSeconds`. Login, registro e refresh: 10/min por IP (Q-31). Contadores em memória por instância (store compartilhado no deploy, 8.4).
+
 | Método | Rota                                                       | Descrição                                                                                                                                                                                                                        |
 | ------ | ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | GET    | `/v1/public/:slug`                                         | `publicProfileResponseSchema`: nome, fuso, cidade/UF (endereço completo só com `showFullAddress`, Q-27), tema, política (RN-92) e serviços `active && public` (RN-91); sem e-mail, CEP ou coordenadas · 404 se o slug não existe |

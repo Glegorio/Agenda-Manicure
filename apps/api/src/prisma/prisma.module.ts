@@ -14,6 +14,6 @@ import { DATABASE_URL, PrismaService } from './prisma.service.js';
     },
     PrismaService,
   ],
-  exports: [PrismaService],
+  exports: [PrismaService, DATABASE_URL],
 })
 export class PrismaModule {}

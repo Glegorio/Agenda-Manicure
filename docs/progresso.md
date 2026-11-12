@@ -256,3 +256,11 @@
   payload SSE com dados pessoais completos (decidir na 4.5/8.1); transporte do token no SSE para web
   (`EventSource` não manda header); barramento em memória só serve 1 instância (8.4).
 - Próximo: 2.10 (pg-boss de limpeza de holds, rate limit nos públicos).
+
+## 2026-11-12 — 2.10 concluída
+
+- `pg-boss` 12: `JobsModule` agenda `maintenance-cleanup` a cada minuto (fila `singleton`) e apaga holds expirados (RN-46) e refresh tokens vencidos (pendência do ADR-0009). `JOBS_ENABLED=false` desliga; nos testes fica desligado e a limpeza é testada direto + um boot real do pg-boss.
+- Rate limit próprio (guard global + `@RateLimit`, janela fixa em memória, `Clock`): Q-25 nos públicos (60/min leituras, 10/min holds/reservas, por IP + slug) e Q-31 (nova, provisória) em login/registro/refresh. 429 com `Retry-After`. Envelope de erro já existia (2.2b).
+- `@opentelemetry/api` na raiz: peer do pg-boss que, só na API, criava outra variante do vitest e quebrava os tipos do `jest-dom` na web. Agora o lockfile tem uma variante só.
+- Pendências: contadores e SSE em memória (1 instância) e `trust proxy` → 8.4; itens da revisão da 2.9 seguem abertos.
+- Próximo: 2.11 (OpenAPI em `/docs`).

@@ -10,6 +10,7 @@ import {
   type RegisterRequest,
   registerRequestSchema,
 } from '@agende/contracts';
+import { RateLimit } from '../common/rate-limit.js';
 import { ZodValidationPipe } from '../common/zod-validation.pipe.js';
 import { AuthService } from './auth.service.js';
 import { Public } from './public.decorator.js';
@@ -20,6 +21,7 @@ export class AuthController {
   constructor(private readonly auth: AuthService) {}
 
   @Post('register')
+  @RateLimit('auth')
   register(
     @Body(new ZodValidationPipe(registerRequestSchema)) body: RegisterRequest,
   ): Promise<AuthSessionResponse> {
@@ -27,6 +29,7 @@ export class AuthController {
   }
 
   @Post('login')
+  @RateLimit('auth')
   @HttpCode(200)
   login(
     @Body(new ZodValidationPipe(loginRequestSchema)) body: LoginRequest,
@@ -35,6 +38,7 @@ export class AuthController {
   }
 
   @Post('refresh')
+  @RateLimit('auth')
   @HttpCode(200)
   refresh(
     @Body(new ZodValidationPipe(refreshRequestSchema)) body: RefreshRequest,

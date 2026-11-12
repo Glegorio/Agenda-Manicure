@@ -3,8 +3,10 @@ import { APP_FILTER } from '@nestjs/core';
 import { AppointmentsModule } from './appointments/appointments.module.js';
 import { AuthModule } from './auth/auth.module.js';
 import { ErrorEnvelopeFilter } from './common/error-envelope.filter.js';
+import { RateLimitModule } from './common/rate-limit.module.js';
 import { ClockModule } from './clock/clock.module.js';
 import { HealthModule } from './health/health.module.js';
+import { JobsModule } from './jobs/jobs.module.js';
 import { PrismaModule } from './prisma/prisma.module.js';
 import { ProfessionalsModule } from './professionals/professionals.module.js';
 import { PublicModule } from './public/public.module.js';
@@ -15,6 +17,7 @@ import { ServicesModule } from './services/services.module.js';
   imports: [
     PrismaModule,
     ClockModule,
+    RateLimitModule,
     AuthModule,
     HealthModule,
     ProfessionalsModule,
@@ -22,6 +25,7 @@ import { ServicesModule } from './services/services.module.js';
     ScheduleModule,
     PublicModule,
     AppointmentsModule,
+    JobsModule,
   ],
   providers: [{ provide: APP_FILTER, useClass: ErrorEnvelopeFilter }],
 })

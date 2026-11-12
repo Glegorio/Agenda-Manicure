@@ -26,6 +26,7 @@ import {
 } from '@agende/contracts';
 import { z } from 'zod';
 import { Public } from '../auth/public.decorator.js';
+import { RateLimit } from '../common/rate-limit.js';
 import { ZodValidationPipe } from '../common/zod-validation.pipe.js';
 import { BookingService } from './booking.service.js';
 import { PublicService } from './public.service.js';
@@ -34,8 +35,9 @@ import { PublicService } from './public.service.js';
 const slugPipe = new ZodValidationPipe(z.string().min(1).max(100));
 const holdTokenPipe = new ZodValidationPipe(createBookingSchema.shape.holdToken);
 
-/** Página pública de agendamento (booking web, sem login). Rate limit na 2.10 (Q-25). */
+/** Página pública de agendamento (booking web, sem login). Rate limit por IP + slug (Q-25). */
 @Public()
+@RateLimit('public-read')
 @Controller('v1/public/:slug')
 export class PublicController {
   constructor(
@@ -69,6 +71,7 @@ export class PublicController {
 
   /** RN-40/41: segura o horário por 5 minutos; 409 se não estiver mais na grade (Q-28). */
   @Post('holds')
+  @RateLimit('public-write')
   createHold(
     @Param('slug', slugPipe) slug: string,
     @Body(new ZodValidationPipe(createHoldSchema)) body: CreateHold,
@@ -77,6 +80,7 @@ export class PublicController {
   }
 
   @Delete('holds/:holdToken')
+  @RateLimit('public-write')
   @HttpCode(204)
   releaseHold(
     @Param('slug', slugPipe) slug: string,
@@ -87,6 +91,7 @@ export class PublicController {
 
   /** RN-43/44: confirma o hold; 410 se expirou, 409 se a constraint barrar (RN-42). */
   @Post('bookings')
+  @RateLimit('public-write')
   confirm(
     @Param('slug', slugPipe) slug: string,
     @Body(new ZodValidationPipe(createBookingSchema)) body: CreateBooking,
