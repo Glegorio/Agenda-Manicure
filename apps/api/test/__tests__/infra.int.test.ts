@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 import type { INestApplication } from '@nestjs/common';
-import { readinessResponseSchema } from '@agende/contracts';
+import { errorResponseSchema, readinessResponseSchema } from '@agende/contracts';
 import request from 'supertest';
 import type { App } from 'supertest/types.js';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -120,7 +120,10 @@ describe('createTestApp', () => {
     const spy = vi.spyOn(prismaInApp, '$queryRaw').mockRejectedValueOnce(new Error('ECONNREFUSED'));
     try {
       const res = await request(app.getHttpServer()).get('/health/ready').expect(503);
-      expect(res.body).toEqual({ status: 'error', database: 'down' });
+      expect(errorResponseSchema.parse(res.body).error).toMatchObject({
+        code: 'SERVICE_UNAVAILABLE',
+        details: { database: 'down' },
+      });
     } finally {
       spy.mockRestore();
     }

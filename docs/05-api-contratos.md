@@ -24,14 +24,19 @@
 Códigos de erro de domínio (sempre `UPPER_SNAKE`):
 `VALIDATION_ERROR`(400), `UNAUTHORIZED`(401), `FORBIDDEN`(403), `NOT_FOUND`(404),
 `SLOT_UNAVAILABLE`(409), `SLUG_TAKEN`(409), `HOLD_EXPIRED`(410),
-`INVALID_TRANSITION`(422), `RATE_LIMITED`(429).
+`INVALID_TRANSITION`(422), `RATE_LIMITED`(429), `INTERNAL_ERROR`(500), `SERVICE_UNAVAILABLE`(503).
+
+Na API: services lançam `DomainError(code, message?, details?)` (mensagem padrão em PT-BR por
+código); entrada validada com `ZodValidationPipe(schema)` → `400 VALIDATION_ERROR` com
+`details.issues: [{ path, message }]`. O filtro global põe toda resposta de erro no envelope;
+erros inesperados viram `500 INTERNAL_ERROR` sem expor a mensagem interna.
 
 ## Infraestrutura (fora de `/v1`, sem auth)
 
-| Método | Rota            | Descrição                                                                                                                     |
-| ------ | --------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| GET    | `/health`       | Liveness, sem acesso ao banco → `{ status: 'ok' }` (`healthResponseSchema`)                                                   |
-| GET    | `/health/ready` | Readiness: `SELECT 1` no banco → `{ status: 'ok', database: 'up' }` (`readinessResponseSchema`) · 503 se o banco não responde |
+| Método | Rota            | Descrição                                                                                                                                           |
+| ------ | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| GET    | `/health`       | Liveness, sem acesso ao banco → `{ status: 'ok' }` (`healthResponseSchema`)                                                                         |
+| GET    | `/health/ready` | Readiness: `SELECT 1` no banco → `{ status: 'ok', database: 'up' }` (`readinessResponseSchema`) · `503 SERVICE_UNAVAILABLE` se o banco não responde |
 
 ## Público (booking web, sem auth)
 

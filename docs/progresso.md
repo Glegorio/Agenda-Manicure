@@ -121,3 +121,18 @@
 - `GET /health/ready` (`readinessResponseSchema`): 200 com o banco no ar, 503 se não.
 - Pendência para a 2.2b: o corpo do 503 ainda não usa o envelope de erro padrão.
 - Próximo: 2.2b (pipe Zod, envelope de erro, mensagens PT-BR).
+
+## 2026-11-12 — 2.2b concluída
+
+- `ZodValidationPipe(schema)` único (`apps/api/src/common/`): devolve o valor parseado; falha →
+  `400 VALIDATION_ERROR` com `details.issues: [{ path, message }]`. `configureContractsLocale()`
+  no `main.ts` e no `createTestApp` (mensagens Zod em PT-BR).
+- `DomainError(code, message?, details?)` com mensagem padrão PT-BR por código; services lançam
+  isto. `ErrorEnvelopeFilter` global: tudo no envelope do doc 05, status sempre de
+  `ERROR_HTTP_STATUS[code]`; 4xx sem código → 400; 5xx/inesperado → 500 logado, sem vazar mensagem;
+  ignora resposta já iniciada (SSE da 2.9).
+- Contrato: novos códigos `INTERNAL_ERROR`(500) e `SERVICE_UNAVAILABLE`(503); readiness 503 no envelope.
+- Pendências: stack no log pode ter PII (mascarar na 8.2); propagar `Retry-After` no rate limit
+  (2.10); mensagem própria de `UNAUTHORIZED` para credencial errada (2.3); violações do Postgres
+  (`23P01` etc.) são mapeadas pelo service de cada módulo, não no filtro.
+- Próximo: 2.3 (auth).

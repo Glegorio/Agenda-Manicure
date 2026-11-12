@@ -350,6 +350,8 @@ describe('erros (doc 05)', () => {
       HOLD_EXPIRED: 410,
       INVALID_TRANSITION: 422,
       RATE_LIMITED: 429,
+      INTERNAL_ERROR: 500,
+      SERVICE_UNAVAILABLE: 503,
     });
   });
 });
