@@ -241,3 +241,18 @@
 - Para a 2.9 (especialista): agendamento manual com `runInScheduleTransaction` e `busyBetween(tx)`;
   transições com `updateMany where status = from`; SSE só depois do commit.
 - Próximo: 2.9 (`appointments`: lista, manual, transições, SSE).
+
+## 2026-11-12 — 2.9 concluída
+
+- `apps/api/src/appointments`: `GET /v1/appointments` (instantes UTC, ≤ 62 dias, todo status que toca
+  o intervalo), `POST` manual (RN-45/Q-19: ignora antecedência, janelas, grade e bloqueios; conflito com
+  agendamento ou hold ativo → 409, sob o lock; cliente `MANUAL` por telefone, existente não muda),
+  transições (domínio `validateTransition`, update condicionado ao status → 422 na corrida, RN-52/53)
+  e SSE `/v1/appointments/stream` (`appointment.created/updated`, ping 25 s). Reserva pública também
+  publica, sem nunca falhar a resposta. Contratos em `packages/contracts/src/appointment.ts`.
+- Motivo de `NO_SHOW` vai para `cancel_reason` (devolvido como `reason`). 30 e2e novos, incl. 10
+  manuais paralelos → 1 sucesso.
+- Pendências (revisão): SSE sem limite de conexões por profissional e sem encerrar ao expirar o token;
+  payload SSE com dados pessoais completos (decidir na 4.5/8.1); transporte do token no SSE para web
+  (`EventSource` não manda header); barramento em memória só serve 1 instância (8.4).
+- Próximo: 2.10 (pg-boss de limpeza de holds, rate limit nos públicos).

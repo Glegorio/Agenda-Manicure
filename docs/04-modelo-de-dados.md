@@ -106,7 +106,7 @@ CHECK E.164 (RN-80); unique `(id, professional_id)` para FK composta.
 | paid_cents            | int null         | RN-52                                   |
 | payment_method        | enum null        | `PIX`,`CREDIT_CARD`,`DEBIT_CARD`,`CASH` |
 | cancelled_by          | enum null        |                                         |
-| cancel_reason         | text null        |                                         |
+| cancel_reason         | text null        | motivo do cancelamento ou da falta      |
 | status_changed_at     | timestamptz      |                                         |
 | booked_name           | text null        | Q-29: nome digitado na reserva pública  |
 

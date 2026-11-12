@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { APP_FILTER } from '@nestjs/core';
+import { AppointmentsModule } from './appointments/appointments.module.js';
 import { AuthModule } from './auth/auth.module.js';
 import { ErrorEnvelopeFilter } from './common/error-envelope.filter.js';
 import { ClockModule } from './clock/clock.module.js';
@@ -20,6 +21,7 @@ import { ServicesModule } from './services/services.module.js';
     ServicesModule,
     ScheduleModule,
     PublicModule,
+    AppointmentsModule,
   ],
   providers: [{ provide: APP_FILTER, useClass: ErrorEnvelopeFilter }],
 })

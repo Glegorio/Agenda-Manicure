@@ -2,6 +2,7 @@ import { createHash, randomBytes } from 'node:crypto';
 import { Injectable } from '@nestjs/common';
 import type { BookingResponse, CreateBooking, HoldResponse } from '@agende/contracts';
 import { computeAvailableSlots, localDateOf } from '@agende/scheduling';
+import { AppointmentsService } from '../appointments/appointments.service.js';
 import { Clock } from '../clock/clock.js';
 import { DomainError } from '../common/domain-error.js';
 import { PG_EXCLUSION_VIOLATION, postgresErrorCode } from '../prisma/postgres-error.js';
@@ -29,6 +30,7 @@ export class BookingService {
     private readonly repository: BookingRepository,
     private readonly publicPage: PublicService,
     private readonly clock: Clock,
+    private readonly appointments: AppointmentsService,
   ) {}
 
   /**
@@ -86,8 +88,9 @@ export class BookingService {
     const pro = await this.publicPage.professional(slug);
     const tokenHash = hashHoldToken(input.holdToken);
 
+    let booking: BookingResponse;
     try {
-      return await this.repository.withScheduleLock(pro.id, async (tx) => {
+      booking = await this.repository.withScheduleLock(pro.id, async (tx) => {
         const hold = await this.repository.findHold(tx, pro.id, tokenHash);
         if (!hold || hold.expiresAt <= this.clock.now()) throw holdExpired();
 
@@ -124,5 +127,8 @@ export class BookingService {
       if (postgresErrorCode(error) === PG_EXCLUSION_VIOLATION) throw slotUnavailable();
       throw error;
     }
+    // Depois do commit: a Agenda Hub recebe a reserva nova (SSE, ADR-0001).
+    await this.appointments.publishCreated(pro.id, booking.appointmentId);
+    return booking;
   }
 }
