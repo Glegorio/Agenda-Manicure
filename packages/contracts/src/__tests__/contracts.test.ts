@@ -347,6 +347,7 @@ describe('erros (doc 05)', () => {
       NOT_FOUND: 404,
       SLOT_UNAVAILABLE: 409,
       SLUG_TAKEN: 409,
+      EMAIL_TAKEN: 409,
       HOLD_EXPIRED: 410,
       INVALID_TRANSITION: 422,
       RATE_LIMITED: 429,

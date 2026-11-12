@@ -8,6 +8,7 @@ export const DEFAULT_ERROR_MESSAGES: Record<ErrorCode, string> = {
   NOT_FOUND: 'Não encontramos o que você procurou.',
   SLOT_UNAVAILABLE: 'Este horário acabou de ser reservado. Escolha outro.',
   SLUG_TAKEN: 'Este link já está em uso. Escolha outro.',
+  EMAIL_TAKEN: 'Já existe uma conta com este e-mail.',
   HOLD_EXPIRED: 'O tempo para confirmar acabou. Escolha o horário novamente.',
   INVALID_TRANSITION: 'Não é possível mudar o status deste agendamento.',
   RATE_LIMITED: 'Muitas tentativas. Aguarde um instante e tente de novo.',

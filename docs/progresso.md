@@ -136,3 +136,17 @@
   (2.10); mensagem própria de `UNAUTHORIZED` para credencial errada (2.3); violações do Postgres
   (`23P01` etc.) são mapeadas pelo service de cada módulo, não no filtro.
 - Próximo: 2.3 (auth).
+
+## 2026-11-12 — 2.3 concluída
+
+- `apps/api/src/auth/`: register/login/refresh/logout (`/v1/auth`, públicas), argon2id
+  (`@node-rs/argon2`, m=19 MiB t=2), access JWT HS256 15 min (`jose`), refresh opaco sha256 de
+  30 dias com rotação por família (Q-22). Rotação, reuso e logout numa transação com
+  `pg_advisory_xact_lock` por família; reuso revoga a família depois do commit. ADR-0009.
+- Guard global (nega por padrão), `@Public()` e `@CurrentProfessional()` (regra 5).
+- Contratos: `slugSchema` + `RESERVED_SLUGS` (RN-90), schemas de auth, código `EMAIL_TAKEN` (409).
+- Exemplo de ambiente: `JWT_ACCESS_SECRET` vazio (mín. 32 caracteres, a API não sobe sem ele);
+  `JWT_REFRESH_SECRET` removido (refresh é opaco). A usuária precisa atualizar o arquivo local.
+- Pendências: rate limit forte em `/register` e `/login` (2.10, mitiga a enumeração por
+  `EMAIL_TAKEN`); limpeza de refresh expirados (2.10); cliente mobile deve serializar o refresh (4.1).
+- Próximo: 2.4 (`professionals`: perfil, slug, tema, parâmetros).

@@ -15,6 +15,7 @@ Crie um novo com `/adr <título>`.
 | 0006 | [API em ESM com NestJS 12, Prisma 7 e Vitest + SWC](0006-api-esm-nest-prisma.md)                   | aceito   |
 | 0007 | [Web com CSS Modules; imports `.ts` nos pacotes internos](0007-web-css-modules-e-resolucao.md)     | aceito   |
 | 0008 | [App mobile (Expo 58) no monorepo](0008-mobile-expo-monorepo.md)                                   | aceito   |
+| 0009 | [Autenticação: argon2id, JWT curto e refresh opaco rotativo](0009-autenticacao.md)                 | aceito   |
 | 0010 | [Testes de integração contra o Postgres compartilhado](0010-testes-integracao.md)                  | aceito   |
 
 ## Template

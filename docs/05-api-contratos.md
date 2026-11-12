@@ -23,7 +23,7 @@
 
 Códigos de erro de domínio (sempre `UPPER_SNAKE`):
 `VALIDATION_ERROR`(400), `UNAUTHORIZED`(401), `FORBIDDEN`(403), `NOT_FOUND`(404),
-`SLOT_UNAVAILABLE`(409), `SLUG_TAKEN`(409), `HOLD_EXPIRED`(410),
+`SLOT_UNAVAILABLE`(409), `SLUG_TAKEN`(409), `EMAIL_TAKEN`(409), `HOLD_EXPIRED`(410),
 `INVALID_TRANSITION`(422), `RATE_LIMITED`(429), `INTERNAL_ERROR`(500), `SERVICE_UNAVAILABLE`(503).
 
 Na API: services lançam `DomainError(code, message?, details?)` (mensagem padrão em PT-BR por
@@ -49,31 +49,44 @@ erros inesperados viram `500 INTERNAL_ERROR` sem expor a mensagem interna.
 | DELETE | `/v1/public/:slug/holds/:holdToken`                        | Libera o hold (cliente voltou)                                               |
 | POST   | `/v1/public/:slug/bookings`                                | `{holdToken, name, phone, notes?}` → agendamento confirmado · 410 se expirou |
 
+## Autenticação (`/v1/auth`, pública — ADR-0009)
+
+| Método | Rota                | Corpo → resposta                                                                                                       |
+| ------ | ------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| POST   | `/v1/auth/register` | `registerRequestSchema` (`slug` opcional, Q-21) → `201` `authSessionResponseSchema` · `409 EMAIL_TAKEN` / `SLUG_TAKEN` |
+| POST   | `/v1/auth/login`    | `loginRequestSchema` → `200` sessão · `401` "E-mail ou senha incorretos." (mesma resposta para e-mail inexistente)     |
+| POST   | `/v1/auth/refresh`  | `{ refreshToken }` → `200` sessão nova (rotação; o antigo deixa de valer) · `401` se inválido, expirado ou reusado     |
+| POST   | `/v1/auth/logout`   | `{ refreshToken }` → `204` (revoga a sessão; idempotente)                                                              |
+
+Sessão: `{ accessToken, accessTokenExpiresAt, refreshToken, refreshTokenExpiresAt, professional: { id, email, businessName, slug } }`.
+Access de 15 min, refresh de 30 dias (Q-22). Reusar um refresh já trocado encerra aquela sessão.
+
 ## Profissional (auth)
 
-| Método    | Rota                                                    | Descrição                                                     |
-| --------- | ------------------------------------------------------- | ------------------------------------------------------------- |
-| POST      | `/v1/auth/register` · `/login` · `/refresh` · `/logout` | Autenticação                                                  |
-| GET/PATCH | `/v1/me`                                                | Perfil, tema, timezone, parâmetros de agenda                  |
-| GET       | `/v1/me/slug-availability?slug=`                        | Checa slug                                                    |
-| CRUD      | `/v1/services`                                          | Serviços                                                      |
-| GET/PUT   | `/v1/schedule/weekly`                                   | Escala semanal (substitui o conjunto)                         |
-| CRUD      | `/v1/schedule/exceptions`                               | Folgas/datas especiais                                        |
-| CRUD      | `/v1/blocks`                                            | Bloqueios manuais                                             |
-| GET       | `/v1/appointments?from=&to=`                            | Agenda (dia/semana)                                           |
-| POST      | `/v1/appointments`                                      | Agendamento manual                                            |
-| POST      | `/v1/appointments/:id/transitions`                      | `{to, paymentMethod?, paidCents?, reason?}`                   |
-| GET       | `/v1/appointments/stream`                               | SSE: `appointment.created/updated`                            |
-| GET       | `/v1/closures/:date`                                    | Pendentes + totais do dia                                     |
-| POST      | `/v1/closures/:date`                                    | Fecha o dia (lote de transições + despesas)                   |
-| CRUD      | `/v1/expenses`                                          | Despesas                                                      |
-| CRUD      | `/v1/clients`                                           | CRM                                                           |
-| POST      | `/v1/clients/import`                                    | Lote de `{name, phone}` selecionados no app                   |
-| GET       | `/v1/reports/summary?period=&date=`                     | KPIs (RN-70..77); `period` = `day`, `week`, `month` ou `year` |
-| GET       | `/v1/reports/services?from=&to=`                        | Ranking de serviços                                           |
-| GET       | `/v1/reports/cashflow?from=&to=`                        | Entradas por método − despesas                                |
-| POST      | `/v1/push-tokens`                                       | Registra token Expo                                           |
-| POST      | `/v1/invites/preview`                                   | Renderiza mensagem de convite com link                        |
+Toda rota abaixo exige `Authorization: Bearer <access>` (guard global; sem token → `401 UNAUTHORIZED`).
+
+| Método    | Rota                                | Descrição                                                     |
+| --------- | ----------------------------------- | ------------------------------------------------------------- |
+| GET/PATCH | `/v1/me`                            | Perfil, tema, timezone, parâmetros de agenda                  |
+| GET       | `/v1/me/slug-availability?slug=`    | Checa slug                                                    |
+| CRUD      | `/v1/services`                      | Serviços                                                      |
+| GET/PUT   | `/v1/schedule/weekly`               | Escala semanal (substitui o conjunto)                         |
+| CRUD      | `/v1/schedule/exceptions`           | Folgas/datas especiais                                        |
+| CRUD      | `/v1/blocks`                        | Bloqueios manuais                                             |
+| GET       | `/v1/appointments?from=&to=`        | Agenda (dia/semana)                                           |
+| POST      | `/v1/appointments`                  | Agendamento manual                                            |
+| POST      | `/v1/appointments/:id/transitions`  | `{to, paymentMethod?, paidCents?, reason?}`                   |
+| GET       | `/v1/appointments/stream`           | SSE: `appointment.created/updated`                            |
+| GET       | `/v1/closures/:date`                | Pendentes + totais do dia                                     |
+| POST      | `/v1/closures/:date`                | Fecha o dia (lote de transições + despesas)                   |
+| CRUD      | `/v1/expenses`                      | Despesas                                                      |
+| CRUD      | `/v1/clients`                       | CRM                                                           |
+| POST      | `/v1/clients/import`                | Lote de `{name, phone}` selecionados no app                   |
+| GET       | `/v1/reports/summary?period=&date=` | KPIs (RN-70..77); `period` = `day`, `week`, `month` ou `year` |
+| GET       | `/v1/reports/services?from=&to=`    | Ranking de serviços                                           |
+| GET       | `/v1/reports/cashflow?from=&to=`    | Entradas por método − despesas                                |
+| POST      | `/v1/push-tokens`                   | Registra token Expo                                           |
+| POST      | `/v1/invites/preview`               | Renderiza mensagem de convite com link                        |
 
 Transições (`POST /v1/appointments/:id/transitions`, RN-52..54, domínio em `@agende/scheduling`):
 

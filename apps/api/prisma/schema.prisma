@@ -105,7 +105,7 @@ model Professional {
   @@map("professionals")
 }
 
-/// Refresh opaco rotativo, guardado só como hash (ADR-0009, a escrever na tarefa 2.3).
+/// Refresh opaco rotativo, guardado só como hash (ADR-0009).
 model RefreshToken {
   id             String    @id @default(uuid(7)) @db.Uuid
   professionalId String    @map("professional_id") @db.Uuid

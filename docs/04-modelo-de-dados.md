@@ -135,7 +135,7 @@ weekday 0–6), `slot_holds` e `manual_blocks` (início < fim).
 ### refresh_tokens
 
 `id, professional_id, token_hash text unique, family_id uuid, expires_at, revoked_at null, created_at, updated_at`
-— refresh opaco rotativo guardado só como hash; reuso de token antigo revoga a família (ADR-0009, tarefa 2.3).
+— refresh opaco rotativo guardado só como hash; reuso de token antigo revoga a família (ADR-0009). Cada login abre uma família; `password_hash` é argon2id.
 
 ### slot_holds
 

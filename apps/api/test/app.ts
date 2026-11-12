@@ -4,10 +4,18 @@ import { Test } from '@nestjs/testing';
 import { configureContractsLocale } from '@agende/contracts';
 import type { App } from 'supertest/types.js';
 import { AppModule } from '../src/app.module.js';
+import { AUTH_CONFIG, type AuthConfig } from '../src/auth/auth.config.js';
 import { Clock } from '../src/clock/clock.js';
 import { DATABASE_URL } from '../src/prisma/prisma.service.js';
 import { FixedClock } from './clock.js';
 import { TEST_DATABASE_URL, assertTestDatabase } from './database.js';
+
+/** Config de auth dos testes (não depende de variáveis de ambiente). */
+export const TEST_AUTH_CONFIG: AuthConfig = {
+  accessTokenSecret: 'segredo-de-teste-com-pelo-menos-32-caracteres',
+  accessTokenTtlSec: 15 * 60,
+  refreshTokenTtlSec: 30 * 24 * 60 * 60,
+};
 
 /** Instante padrão dos testes de API: quinta, 12/11/2026 09:00 em São Paulo. */
 export const DEFAULT_TEST_NOW = '2026-11-12T12:00:00Z';
@@ -26,6 +34,8 @@ export async function createTestApp(
   })
     .overrideProvider(DATABASE_URL)
     .useValue(TEST_DATABASE_URL)
+    .overrideProvider(AUTH_CONFIG)
+    .useValue(TEST_AUTH_CONFIG)
     .overrideProvider(Clock)
     .useValue(options.clock ?? new FixedClock(DEFAULT_TEST_NOW))
     .compile();

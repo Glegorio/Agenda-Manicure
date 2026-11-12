@@ -17,11 +17,13 @@ import type { App } from 'supertest/types.js';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { z } from 'zod';
 import { createTestApp } from '../../../test/app.js';
+import { Public } from '../../auth/public.decorator.js';
 import { DomainError } from '../domain-error.js';
 import { ZodValidationPipe } from '../zod-validation.pipe.js';
 
 const echoSchema = z.object({ name: z.string().min(2), priceCents: z.number().int() });
 
+@Public()
 @Controller('__test__')
 class ProbeController {
   @Post('echo')
