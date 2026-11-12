@@ -1,14 +1,20 @@
 import { Controller, Get } from '@nestjs/common';
-import type { HealthResponse } from '@agende/contracts';
+import type { HealthResponse, ReadinessResponse } from '@agende/contracts';
 import { HealthService } from './health.service.js';
 
-/** Liveness: não acessa o banco (readiness entra na tarefa 2.2). */
 @Controller('health')
 export class HealthController {
   constructor(private readonly healthService: HealthService) {}
 
+  /** Liveness: não acessa o banco. */
   @Get()
   get(): HealthResponse {
     return this.healthService.check();
+  }
+
+  /** Readiness: confirma que o banco responde (503 se não). */
+  @Get('ready')
+  ready(): Promise<ReadinessResponse> {
+    return this.healthService.ready();
   }
 }

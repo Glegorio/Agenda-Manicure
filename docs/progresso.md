@@ -110,3 +110,14 @@
 - 0.7 Scripts raiz (`dev`, `db:generate`, `format`), docs formatados.
 - 0.8 CI GitHub Actions com Postgres; primeiro push da `main`.
 - 0.9 Comandos e stack reais no `CLAUDE.md`; aceite em clone limpo.
+
+## 2026-11-12 — 2.2 concluída
+
+- `PrismaService`/`PrismaModule` globais (token `DATABASE_URL`, sobrescrito nos testes) e
+  `Clock` injetável (`SystemClock`; `FixedClock` em `apps/api/test/clock.ts`) para RN-33/40/46.
+- Helpers em `apps/api/test/`: `createTestPrisma`, `resetDatabase` (TRUNCATE de todas as tabelas
+  do catálogo, recusa banco que não seja `*_test`), `createTestApp({ clock })`, factories
+  (`professional`, `client`, `service`, `appointment` com snapshot RN-11 e `blockEndAt`).
+- `GET /health/ready` (`readinessResponseSchema`): 200 com o banco no ar, 503 se não.
+- Pendência para a 2.2b: o corpo do 503 ainda não usa o envelope de erro padrão.
+- Próximo: 2.2b (pipe Zod, envelope de erro, mensagens PT-BR).

@@ -28,9 +28,10 @@ Códigos de erro de domínio (sempre `UPPER_SNAKE`):
 
 ## Infraestrutura (fora de `/v1`, sem auth)
 
-| Método | Rota      | Descrição                                                                   |
-| ------ | --------- | --------------------------------------------------------------------------- |
-| GET    | `/health` | Liveness, sem acesso ao banco → `{ status: 'ok' }` (`healthResponseSchema`) |
+| Método | Rota            | Descrição                                                                                                                     |
+| ------ | --------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| GET    | `/health`       | Liveness, sem acesso ao banco → `{ status: 'ok' }` (`healthResponseSchema`)                                                   |
+| GET    | `/health/ready` | Readiness: `SELECT 1` no banco → `{ status: 'ok', database: 'up' }` (`readinessResponseSchema`) · 503 se o banco não responde |
 
 ## Público (booking web, sem auth)
 

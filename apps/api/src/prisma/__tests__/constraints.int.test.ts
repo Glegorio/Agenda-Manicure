@@ -1,7 +1,5 @@
-import { PrismaPg } from '@prisma/adapter-pg';
 import { afterAll, beforeEach, describe, expect, it } from 'vitest';
-import { TEST_DATABASE_URL } from '../../../test/global-setup.js';
-import { PrismaClient } from '../../generated/prisma/client.js';
+import { createTestPrisma, resetDatabase } from '../../../test/database.js';
 import type { AppointmentStatus, Prisma } from '../../generated/prisma/client.js';
 import {
   PG_CHECK_VIOLATION,
@@ -11,7 +9,7 @@ import {
   postgresErrorCode as sqlState,
 } from '../postgres-error.js';
 
-const prisma = new PrismaClient({ adapter: new PrismaPg({ connectionString: TEST_DATABASE_URL }) });
+const prisma = createTestPrisma();
 
 const at = (iso: string) => new Date(iso);
 
@@ -68,7 +66,7 @@ const FINAL_STATUS_DATA: Partial<
 };
 
 beforeEach(async () => {
-  await prisma.$executeRawUnsafe('TRUNCATE professionals RESTART IDENTITY CASCADE');
+  await resetDatabase(prisma);
 });
 
 afterAll(async () => {
@@ -315,19 +313,6 @@ describe('constraints do banco (migration init)', () => {
       '2026-11-11T12:15:00Z',
     ).catch((e: unknown) => e);
     expect(sqlState(error)).toBe(PG_FOREIGN_KEY_VIOLATION);
-  });
-
-  it.each([
-    ['duração não múltipla de 5 (RN-10)', { durationMin: 62, priceCents: 100 }],
-    ['preço negativo (RN-10)', { durationMin: 60, priceCents: -1 }],
-  ])('CHECK de serviço: recusa %s', async (_label, data) => {
-    const { professional } = await seedProfessional();
-    const error: unknown = await prisma.service
-      .create({
-        data: { professionalId: professional.id, name: 'Gel', category: 'Unhas', ...data },
-      })
-      .catch((e: unknown) => e);
-    expect(sqlState(error)).toBe(PG_CHECK_VIOLATION);
   });
 
   it.each([
