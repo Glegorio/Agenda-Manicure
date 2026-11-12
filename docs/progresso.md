@@ -268,3 +268,18 @@
   IPv6 por /64; limite de holds ativos por IP; balde de login por e-mail; log dos 429 (8.2); itens
   da revisão da 2.9 seguem abertos.
 - Próximo: 2.11 (OpenAPI em `/docs`).
+
+## 2026-11-12 — 2.11 concluída (Fase 2 encerrada)
+
+- OpenAPI 3.1 gerado de `@agende/contracts` com `z.toJSONSchema` (Zod 4, sem dependência nova):
+  tabela `apps/api/src/openapi/openapi.routes.ts` → `buildOpenApiDocument()`. Entradas pelo lado
+  `input`, respostas pelo `output`; erros agrupados por status a partir de `ERROR_HTTP_STATUS`.
+- `GET /docs` (Scalar via CDN) e `GET /docs/openapi.json`, `@Public()`, só com `NODE_ENV` ≠
+  `production`. Teste de paridade: as 33 operações documentadas = rotas registradas no Nest.
+- `refine` não aparece no schema (limite do JSON Schema); a regra segue valendo na API.
+- Aceite da Fase 2: fluxo público (perfil → slots → hold → reserva) e 20 holds paralelos → 1 sucesso
+  verdes. Pendências de revisão da 2.9/2.10 seguem listadas acima.
+- Revisão: sem 🔴; docs viraram opt-in (`API_DOCS_ENABLED`), Scalar com versão fixa. Pendências:
+  SRI no script do CDN; paridade ainda não confere `auth`/`rateLimited`/schemas contra os
+  controllers (tabela pode divergir em silêncio — ideal: controllers importarem da tabela).
+- Próximo: Fase 3 — `/iniciar-fase 3` (3.1 `packages/ui-tokens`).

@@ -6,6 +6,7 @@ import { ErrorEnvelopeFilter } from './common/error-envelope.filter.js';
 import { RateLimitModule } from './common/rate-limit.module.js';
 import { ClockModule } from './clock/clock.module.js';
 import { HealthModule } from './health/health.module.js';
+import { docsModules } from './openapi/docs.module.js';
 import { JobsModule } from './jobs/jobs.module.js';
 import { PrismaModule } from './prisma/prisma.module.js';
 import { ProfessionalsModule } from './professionals/professionals.module.js';
@@ -26,6 +27,7 @@ import { ServicesModule } from './services/services.module.js';
     PublicModule,
     AppointmentsModule,
     JobsModule,
+    ...docsModules(process.env),
   ],
   providers: [{ provide: APP_FILTER, useClass: ErrorEnvelopeFilter }],
 })

@@ -3,6 +3,10 @@
 > Fonte de verdade executável: schemas Zod em `packages/contracts` (common, errors, service,
 > schedule, availability, booking — tarefa 1.6; auth, clientes, relatórios entram nas fases 2–7).
 > Este documento é o índice humano. Mudou um endpoint? Atualize os dois no mesmo PR.
+>
+> **OpenAPI 3.1** gerado dos schemas (2.11): `GET /docs` (referência navegável) e
+> `GET /docs/openapi.json`, só com `API_DOCS_ENABLED=true` (opt-in de dev). A tabela de rotas fica em
+> `apps/api/src/openapi/openapi.routes.ts`; um teste falha se ela divergir das rotas do Nest.
 
 ## Convenções
 

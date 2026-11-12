@@ -5,7 +5,7 @@
 > `/registrar-progresso` ao fim de cada sessão. Marque `[x]` somente quando os critérios de
 > aceite da tarefa passarem (testes verdes + lint + typecheck).
 
-**Fase atual:** 2
+**Fase atual:** 3
 
 ---
 
@@ -47,7 +47,7 @@
 - [x] 2.8 `holds` com advisory lock + `bookings` (RN-40..46) — **teste de concorrência**: 20 requisições paralelas no mesmo slot → exatamente 1 sucesso
 - [x] 2.9 `appointments` (lista, manual, transições, SSE)
 - [x] 2.10 Job pg-boss de limpeza de holds; formato de erro padrão; rate limit nos públicos
-- [ ] 2.11 OpenAPI gerado a partir dos schemas, publicado em `/docs` no ambiente dev
+- [x] 2.11 OpenAPI gerado a partir dos schemas, publicado em `/docs` no ambiente dev
 
 **Aceite:** e2e do fluxo público completo (perfil → slots → hold → booking) verde; teste de concorrência verde.
 

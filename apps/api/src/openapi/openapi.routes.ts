@@ -1,0 +1,407 @@
+import {
+  affectedAppointmentSchema,
+  appointmentListQuerySchema,
+  appointmentResponseSchema,
+  authSessionResponseSchema,
+  availabilityDaysQuerySchema,
+  availabilityDaysResponseSchema,
+  availabilityQuerySchema,
+  availabilityResponseSchema,
+  blockInputSchema,
+  blockListQuerySchema,
+  blockMutationResponseSchema,
+  blockResponseSchema,
+  bookingResponseSchema,
+  createBookingSchema,
+  createHoldSchema,
+  type ErrorCode,
+  exceptionBodySchema,
+  exceptionListQuerySchema,
+  exceptionMutationResponseSchema,
+  exceptionResponseSchema,
+  healthResponseSchema,
+  holdResponseSchema,
+  idSchema,
+  localDateSchema,
+  loginRequestSchema,
+  logoutRequestSchema,
+  manualAppointmentInputSchema,
+  professionalProfileSchema,
+  professionalUpdateSchema,
+  publicProfileResponseSchema,
+  readinessResponseSchema,
+  refreshRequestSchema,
+  registerRequestSchema,
+  serviceDeleteResponseSchema,
+  serviceInputSchema,
+  serviceResponseSchema,
+  serviceUpdateSchema,
+  slugAvailabilityQuerySchema,
+  slugAvailabilityResponseSchema,
+  transitionRequestSchema,
+  weeklyScheduleInputSchema,
+  weeklyScheduleMutationResponseSchema,
+  weeklyScheduleResponseSchema,
+} from '@agende/contracts';
+import { z } from 'zod';
+
+type Method = 'get' | 'post' | 'put' | 'patch' | 'delete';
+
+/**
+ * Uma rota da API descrita só com schemas de `@agende/contracts` (regra 6): o documento OpenAPI
+ * é derivado daqui. O teste `openapi.e2e.test.ts` garante que esta tabela e as rotas registradas
+ * no Nest são as mesmas.
+ */
+export interface RouteSpec {
+  readonly method: Method;
+  /** Caminho no formato OpenAPI (`{param}`). */
+  readonly path: string;
+  readonly tag: string;
+  readonly summary: string;
+  /** `false` = rota `@Public()`. */
+  readonly auth: boolean;
+  readonly params?: Readonly<Record<string, z.ZodType>>;
+  readonly query?: z.ZodType;
+  readonly body?: z.ZodType;
+  readonly response: { readonly status: number; readonly schema?: z.ZodType; readonly sse?: true };
+  /** Erros de domínio além dos implícitos (400 com entrada, 401 com auth, 429 com rate limit). */
+  readonly errors?: readonly ErrorCode[];
+  readonly rateLimited?: true;
+}
+
+const id = { id: idSchema };
+const slug = { slug: z.string().min(1).max(100) };
+const date = { date: localDateSchema };
+const affectedOnly = z.object({ affectedAppointments: z.array(affectedAppointmentSchema) });
+
+export const ROUTES: readonly RouteSpec[] = [
+  // Saúde
+  {
+    method: 'get',
+    path: '/health',
+    tag: 'Saúde',
+    summary: 'Liveness (não acessa o banco)',
+    auth: false,
+    response: { status: 200, schema: healthResponseSchema },
+  },
+  {
+    method: 'get',
+    path: '/health/ready',
+    tag: 'Saúde',
+    summary: 'Readiness: o banco responde',
+    auth: false,
+    response: { status: 200, schema: readinessResponseSchema },
+    errors: ['SERVICE_UNAVAILABLE'],
+  },
+
+  // Autenticação (ADR-0009, Q-31)
+  {
+    method: 'post',
+    path: '/v1/auth/register',
+    tag: 'Autenticação',
+    summary: 'Cadastra a profissional e abre a sessão',
+    auth: false,
+    body: registerRequestSchema,
+    response: { status: 201, schema: authSessionResponseSchema },
+    errors: ['EMAIL_TAKEN', 'SLUG_TAKEN'],
+    rateLimited: true,
+  },
+  {
+    method: 'post',
+    path: '/v1/auth/login',
+    tag: 'Autenticação',
+    summary: 'Entra com e-mail e senha',
+    auth: false,
+    body: loginRequestSchema,
+    response: { status: 200, schema: authSessionResponseSchema },
+    errors: ['UNAUTHORIZED'],
+    rateLimited: true,
+  },
+  {
+    method: 'post',
+    path: '/v1/auth/refresh',
+    tag: 'Autenticação',
+    summary: 'Troca o refresh token (rotação; reuso encerra a sessão)',
+    auth: false,
+    body: refreshRequestSchema,
+    response: { status: 200, schema: authSessionResponseSchema },
+    errors: ['UNAUTHORIZED'],
+    rateLimited: true,
+  },
+  {
+    method: 'post',
+    path: '/v1/auth/logout',
+    tag: 'Autenticação',
+    summary: 'Encerra a sessão do refresh token',
+    auth: false,
+    body: logoutRequestSchema,
+    response: { status: 204 },
+  },
+
+  // Perfil
+  {
+    method: 'get',
+    path: '/v1/me',
+    tag: 'Perfil',
+    summary: 'Perfil e parâmetros de agenda',
+    auth: true,
+    response: { status: 200, schema: professionalProfileSchema },
+  },
+  {
+    method: 'patch',
+    path: '/v1/me',
+    tag: 'Perfil',
+    summary: 'Atualiza o perfil (parcial; slug Q-21, endereço Q-27, RN-22..25)',
+    auth: true,
+    body: professionalUpdateSchema,
+    response: { status: 200, schema: professionalProfileSchema },
+    errors: ['SLUG_TAKEN'],
+  },
+  {
+    method: 'get',
+    path: '/v1/me/slug-availability',
+    tag: 'Perfil',
+    summary: 'Confere se um slug está livre (RN-90)',
+    auth: true,
+    query: slugAvailabilityQuerySchema,
+    response: { status: 200, schema: slugAvailabilityResponseSchema },
+  },
+
+  // Serviços (RN-10..12)
+  {
+    method: 'get',
+    path: '/v1/services',
+    tag: 'Serviços',
+    summary: 'Lista os serviços, inclusive inativos',
+    auth: true,
+    response: { status: 200, schema: z.array(serviceResponseSchema) },
+  },
+  {
+    method: 'post',
+    path: '/v1/services',
+    tag: 'Serviços',
+    summary: 'Cria um serviço',
+    auth: true,
+    body: serviceInputSchema,
+    response: { status: 201, schema: serviceResponseSchema },
+  },
+  {
+    method: 'get',
+    path: '/v1/services/{id}',
+    tag: 'Serviços',
+    summary: 'Detalha um serviço',
+    auth: true,
+    params: id,
+    response: { status: 200, schema: serviceResponseSchema },
+    errors: ['NOT_FOUND'],
+  },
+  {
+    method: 'patch',
+    path: '/v1/services/{id}',
+    tag: 'Serviços',
+    summary: 'Atualiza um serviço (agendamentos existentes não mudam, RN-11)',
+    auth: true,
+    params: id,
+    body: serviceUpdateSchema,
+    response: { status: 200, schema: serviceResponseSchema },
+    errors: ['NOT_FOUND'],
+  },
+  {
+    method: 'delete',
+    path: '/v1/services/{id}',
+    tag: 'Serviços',
+    summary: 'Apaga ou desativa (RN-12, Q-24)',
+    auth: true,
+    params: id,
+    response: { status: 200, schema: serviceDeleteResponseSchema },
+    errors: ['NOT_FOUND'],
+  },
+
+  // Escala (RN-20, RN-21, Q-20, Q-26)
+  {
+    method: 'get',
+    path: '/v1/schedule/weekly',
+    tag: 'Escala',
+    summary: 'Escala semanal',
+    auth: true,
+    response: { status: 200, schema: weeklyScheduleResponseSchema },
+  },
+  {
+    method: 'put',
+    path: '/v1/schedule/weekly',
+    tag: 'Escala',
+    summary: 'Substitui a escala semanal e devolve os agendamentos afetados',
+    auth: true,
+    body: weeklyScheduleInputSchema,
+    response: { status: 200, schema: weeklyScheduleMutationResponseSchema },
+  },
+  {
+    method: 'get',
+    path: '/v1/schedule/exceptions',
+    tag: 'Escala',
+    summary: 'Exceções por data (≤ 366 dias)',
+    auth: true,
+    query: exceptionListQuerySchema,
+    response: { status: 200, schema: z.array(exceptionResponseSchema) },
+  },
+  {
+    method: 'put',
+    path: '/v1/schedule/exceptions/{date}',
+    tag: 'Escala',
+    summary: 'Cria ou substitui a exceção da data',
+    auth: true,
+    params: date,
+    body: exceptionBodySchema,
+    response: { status: 200, schema: exceptionMutationResponseSchema },
+  },
+  {
+    method: 'delete',
+    path: '/v1/schedule/exceptions/{date}',
+    tag: 'Escala',
+    summary: 'Remove a exceção da data',
+    auth: true,
+    params: date,
+    response: { status: 200, schema: affectedOnly },
+    errors: ['NOT_FOUND'],
+  },
+  {
+    method: 'get',
+    path: '/v1/blocks',
+    tag: 'Escala',
+    summary: 'Bloqueios manuais no intervalo',
+    auth: true,
+    query: blockListQuerySchema,
+    response: { status: 200, schema: z.array(blockResponseSchema) },
+  },
+  {
+    method: 'post',
+    path: '/v1/blocks',
+    tag: 'Escala',
+    summary: 'Cria um bloqueio e devolve os agendamentos afetados',
+    auth: true,
+    body: blockInputSchema,
+    response: { status: 201, schema: blockMutationResponseSchema },
+  },
+  {
+    method: 'delete',
+    path: '/v1/blocks/{id}',
+    tag: 'Escala',
+    summary: 'Remove um bloqueio',
+    auth: true,
+    params: id,
+    response: { status: 204 },
+    errors: ['NOT_FOUND'],
+  },
+
+  // Agenda (RN-45, RN-50..54, ADR-0001)
+  {
+    method: 'get',
+    path: '/v1/appointments',
+    tag: 'Agenda',
+    summary: 'Agendamentos que tocam o intervalo (≤ 62 dias)',
+    auth: true,
+    query: appointmentListQuerySchema,
+    response: { status: 200, schema: z.array(appointmentResponseSchema) },
+  },
+  {
+    method: 'post',
+    path: '/v1/appointments',
+    tag: 'Agenda',
+    summary: 'Agendamento manual (RN-45, Q-19)',
+    auth: true,
+    body: manualAppointmentInputSchema,
+    response: { status: 201, schema: appointmentResponseSchema },
+    errors: ['NOT_FOUND', 'SLOT_UNAVAILABLE'],
+  },
+  {
+    method: 'post',
+    path: '/v1/appointments/{id}/transitions',
+    tag: 'Agenda',
+    summary: 'Muda o status (RN-52..54)',
+    auth: true,
+    params: id,
+    body: transitionRequestSchema,
+    response: { status: 200, schema: appointmentResponseSchema },
+    errors: ['NOT_FOUND', 'INVALID_TRANSITION'],
+  },
+  {
+    method: 'get',
+    path: '/v1/appointments/stream',
+    tag: 'Agenda',
+    summary: 'SSE: `appointment.created` / `appointment.updated` (+ `ping` a cada 25 s)',
+    auth: true,
+    response: { status: 200, schema: appointmentResponseSchema, sse: true },
+  },
+
+  // Página pública (Q-25)
+  {
+    method: 'get',
+    path: '/v1/public/{slug}',
+    tag: 'Página pública',
+    summary: 'Perfil público e serviços visíveis (RN-91)',
+    auth: false,
+    params: slug,
+    response: { status: 200, schema: publicProfileResponseSchema },
+    errors: ['NOT_FOUND'],
+    rateLimited: true,
+  },
+  {
+    method: 'get',
+    path: '/v1/public/{slug}/availability',
+    tag: 'Página pública',
+    summary: 'Horários livres do dia (instantes UTC, RN-30..36)',
+    auth: false,
+    params: slug,
+    query: availabilityQuerySchema,
+    response: { status: 200, schema: availabilityResponseSchema },
+    errors: ['NOT_FOUND'],
+    rateLimited: true,
+  },
+  {
+    method: 'get',
+    path: '/v1/public/{slug}/availability/days',
+    tag: 'Página pública',
+    summary: 'Dias com vaga no intervalo',
+    auth: false,
+    params: slug,
+    query: availabilityDaysQuerySchema,
+    response: { status: 200, schema: availabilityDaysResponseSchema },
+    errors: ['NOT_FOUND'],
+    rateLimited: true,
+  },
+  {
+    method: 'post',
+    path: '/v1/public/{slug}/holds',
+    tag: 'Página pública',
+    summary: 'Segura o horário por 5 minutos (RN-40/41, Q-28)',
+    auth: false,
+    params: slug,
+    body: createHoldSchema,
+    response: { status: 201, schema: holdResponseSchema },
+    errors: ['NOT_FOUND', 'SLOT_UNAVAILABLE', 'SERVICE_UNAVAILABLE'],
+    rateLimited: true,
+  },
+  {
+    method: 'delete',
+    path: '/v1/public/{slug}/holds/{holdToken}',
+    tag: 'Página pública',
+    summary: 'Libera o horário (idempotente)',
+    auth: false,
+    params: { ...slug, holdToken: createBookingSchema.shape.holdToken },
+    response: { status: 204 },
+    errors: ['NOT_FOUND'],
+    rateLimited: true,
+  },
+  {
+    method: 'post',
+    path: '/v1/public/{slug}/bookings',
+    tag: 'Página pública',
+    summary: 'Confirma a reserva (RN-43/44, RN-81)',
+    auth: false,
+    params: slug,
+    body: createBookingSchema,
+    response: { status: 201, schema: bookingResponseSchema },
+    errors: ['NOT_FOUND', 'HOLD_EXPIRED', 'SLOT_UNAVAILABLE', 'SERVICE_UNAVAILABLE'],
+    rateLimited: true,
+  },
+];
