@@ -166,7 +166,10 @@ Formas de pagamento: `PIX`, `CREDIT_CARD`, `DEBIT_CARD`, `CASH`.
 
 - **RN-80** — Cliente é identificada por telefone normalizado em **E.164** (`+5511999998888`),
   único por profissional.
-- **RN-81** — Agendamento pela web cria/atualiza a cliente pelo telefone (upsert), sem login.
+- **RN-81** — Agendamento pela web encontra a cliente pelo telefone ou a cria, sem login. Cliente
+  já existente **não** tem o cadastro alterado pela web (sem login, quem sabe o telefone de alguém
+  não pode renomeá-la); o nome digitado fica no próprio agendamento (`booked_name`) e a
+  profissional decide pelo app (Q-29).
 - **RN-82** — Importação de contatos: só nome e telefone; a profissional escolhe quais
   importar (nunca importação silenciosa total). Ver LGPD em `docs/06-whatsapp-e-notificacoes.md`.
 - **RN-83** — Categorias/tags livres por cliente (ex.: "VIP", "Gel", "Novas").
