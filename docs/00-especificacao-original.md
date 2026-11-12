@@ -27,7 +27,7 @@ Plataforma SaaS Mobile-First direcionada a manicures e profissionais autônomas 
 O sistema não trabalha apenas com horários fixos de início, mas calcula a grade em função de:
 Horário de Início + Duração Estimada do Serviço + Intervalo de Transição (Buffer Time).
 
-_Exemplo:_ Se a profissional abre às 08:00, oferece Alongamento em Gel (120 min) e tem Buffer Time de 15 min, o próximo slot vago é calculado automaticamente para 10:15.
+*Exemplo:* Se a profissional abre às 08:00, oferece Alongamento em Gel (120 min) e tem Buffer Time de 15 min, o próximo slot vago é calculado automaticamente para 10:15.
 
 **Sincronização Atômica de Agenda (Concurrency Management):**
 Trava temporária de 5 minutos no banco de dados enquanto o cliente preenche o formulário na Web, evitando double-booking (dois agendamentos no mesmo horário simultaneamente).
@@ -98,10 +98,10 @@ Todos os botões primários de ação (CTA como "Agendar", "Salvar", "Confirmar 
 
 ## 5. Sugestão de Stack Tecnológico
 
-| Camada               | Tecnologia Recomendada                | Justificativa                                                                 |
-| -------------------- | ------------------------------------- | ----------------------------------------------------------------------------- |
-| Mobile App           | React Native (Expo) / Flutter         | Desenvolvimento híbrido rápido (iOS/Android) com alta performance de UI.      |
-| Web Booking (Client) | Next.js / React (PWA)                 | Carregamento ultrarrápido, otimizado para navegadores mobile.                 |
-| Backend & API        | Node.js (NestJS) ou Python (FastAPI)  | Alta performance em I/O, fácil manipulação de datas e cronogramas.            |
-| Banco de Dados       | PostgreSQL                            | Robusto, relacional, ideal para controle financeiro e concorrência de agenda. |
-| Notificações & Whats | API Oficial WhatsApp Business / Z-API | Envio automatizado de mensagens de confirmação e lembretes.                   |
+| Camada | Tecnologia Recomendada | Justificativa |
+|---|---|---|
+| Mobile App | React Native (Expo) / Flutter | Desenvolvimento híbrido rápido (iOS/Android) com alta performance de UI. |
+| Web Booking (Client) | Next.js / React (PWA) | Carregamento ultrarrápido, otimizado para navegadores mobile. |
+| Backend & API | Node.js (NestJS) ou Python (FastAPI) | Alta performance em I/O, fácil manipulação de datas e cronogramas. |
+| Banco de Dados | PostgreSQL | Robusto, relacional, ideal para controle financeiro e concorrência de agenda. |
+| Notificações & Whats | API Oficial WhatsApp Business / Z-API | Envio automatizado de mensagens de confirmação e lembretes. |
