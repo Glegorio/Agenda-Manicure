@@ -40,7 +40,7 @@
 - [x] 2.2 Infra de teste de integração (Postgres real via docker/Testcontainers, reset por teste)
 - [x] 2.2b Pipe Zod único, envelope de erro padrão e mensagens PT-BR (antecipado da 2.10, Q-18)
 - [x] 2.3 Módulo `auth` (registro, login, refresh, argon2id) + guard + escopo por `professional_id`
-- [ ] 2.4 `professionals` (perfil, slug com RN-90, tema, parâmetros)
+- [x] 2.4 `professionals` (perfil, slug com RN-90, tema, parâmetros)
 - [ ] 2.5 `services` CRUD (RN-10..12)
 - [ ] 2.6 `schedule` (semanal, exceções, bloqueios)
 - [ ] 2.7 `availability` público (usa domínio) + `availability/days`

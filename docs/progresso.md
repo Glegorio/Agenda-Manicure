@@ -150,3 +150,16 @@
 - Pendências: rate limit forte em `/register` e `/login` (2.10, mitiga a enumeração por
   `EMAIL_TAKEN`); limpeza de refresh expirados (2.10); cliente mobile deve serializar o refresh (4.1).
 - Próximo: 2.4 (`professionals`: perfil, slug, tema, parâmetros).
+
+## 2026-11-12 — 2.4 concluída
+
+- `apps/api/src/professionals/`: `GET/PATCH /v1/me` e `GET /v1/me/slug-availability`, sempre pelo
+  id do token (regra 5). PATCH parcial: nome, slug (troca permitida, não apagável — Q-21),
+  endereço (UF maiúscula, CEP com 8 dígitos), `lat`/`lng` juntos, tema, política de cancelamento,
+  RN-22..25 e `closingReminderOffsetMin` (RN-60, 0–720). Slug em uso → `409 SLUG_TAKEN`, inclusive
+  na corrida (índice único citext). Conta apagada com token válido → 401.
+- Contratos: `professional.ts` (perfil, update, paletas/modos, slug-availability com
+  `INVALID_FORMAT`/`RESERVED`/`TAKEN`).
+- Fora do escopo: logo/capa (Q-09), template de WhatsApp (5.2), troca de e-mail/senha.
+- Débito: `schedulingSettingsUpdateSchema` (contracts) ficou sem uso; remover quando a 2.6 confirmar.
+- Próximo: 2.5 (`services` CRUD, RN-10..12).
