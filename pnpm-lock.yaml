@@ -187,6 +187,9 @@ importers:
       '@agende/contracts':
         specifier: workspace:*
         version: link:../../packages/contracts
+      '@agende/scheduling':
+        specifier: workspace:*
+        version: link:../../packages/scheduling
       '@nestjs/common':
         specifier: ^12.4.2
         version: 12.4.2(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1)

@@ -42,7 +42,7 @@
 - [x] 2.3 Módulo `auth` (registro, login, refresh, argon2id) + guard + escopo por `professional_id`
 - [x] 2.4 `professionals` (perfil, slug com RN-90, tema, parâmetros)
 - [x] 2.5 `services` CRUD (RN-10..12)
-- [ ] 2.6 `schedule` (semanal, exceções, bloqueios)
+- [x] 2.6 `schedule` (semanal, exceções, bloqueios)
 - [ ] 2.7 `availability` público (usa domínio) + `availability/days`
 - [ ] 2.8 `holds` com advisory lock + `bookings` (RN-40..46) — **teste de concorrência**: 20 requisições paralelas no mesmo slot → exatamente 1 sucesso
 - [ ] 2.9 `appointments` (lista, manual, transições, SSE)

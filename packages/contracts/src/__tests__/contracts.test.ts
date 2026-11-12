@@ -16,7 +16,6 @@ import {
   phoneE164Schema,
   scheduleExceptionInputSchema,
   schedulingSettingsSchema,
-  schedulingSettingsUpdateSchema,
   serviceInputSchema,
   serviceUpdateSchema,
   timeZoneSchema,
@@ -419,11 +418,6 @@ describe('ajustes da revisão (1.6)', () => {
         expiresAt: '2026-11-11T11:05:00Z',
       }),
     ).toBe(false);
-  });
-
-  it('PATCH de parâmetros de agenda é parcial mas não vazio', () => {
-    expect(ok(schedulingSettingsUpdateSchema, { bufferMin: 15 })).toBe(true);
-    expect(ok(schedulingSettingsUpdateSchema, {})).toBe(false);
   });
 
   it('mensagens padrão do Zod em português após configureContractsLocale()', () => {

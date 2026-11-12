@@ -6,6 +6,7 @@ import { ClockModule } from './clock/clock.module.js';
 import { HealthModule } from './health/health.module.js';
 import { PrismaModule } from './prisma/prisma.module.js';
 import { ProfessionalsModule } from './professionals/professionals.module.js';
+import { ScheduleModule } from './schedule/schedule.module.js';
 import { ServicesModule } from './services/services.module.js';
 
 @Module({
@@ -16,6 +17,7 @@ import { ServicesModule } from './services/services.module.js';
     HealthModule,
     ProfessionalsModule,
     ServicesModule,
+    ScheduleModule,
   ],
   providers: [{ provide: APP_FILTER, useClass: ErrorEnvelopeFilter }],
 })

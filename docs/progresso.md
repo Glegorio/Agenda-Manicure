@@ -161,7 +161,7 @@
 - Contratos: `professional.ts` (perfil, update, paletas/modos, slug-availability com
   `INVALID_FORMAT`/`RESERVED`/`TAKEN`).
 - Fora do escopo: logo/capa (Q-09), template de WhatsApp (5.2), troca de e-mail/senha.
-- Débito: `schedulingSettingsUpdateSchema` (contracts) ficou sem uso; remover quando a 2.6 confirmar.
+- Débito: `schedulingSettingsUpdateSchema` (contracts) ficou sem uso — removido na 2.6.
 - Próximo: 2.5 (`services` CRUD, RN-10..12).
 
 ## 2026-11-12 — 2.5 concluída
@@ -179,3 +179,22 @@
 - Débitos: `serviceSchema` (contracts) duplica `serviceResponseSchema`; helper `defined()` repetido
   em professionals/services (extrair no 3º uso).
 - Próximo: 2.6 (`schedule`: semanal, exceções, bloqueios).
+
+## 2026-11-12 — 2.6 concluída
+
+- `packages/scheduling/src/working-hours.ts`: `findAppointmentsOutsideWorkingHours` e
+  `findAppointmentsNewlyOutsideWorkingHours` (puras; dia local, exceção > escala, Q-17, DST com
+  salto, hora repetida e virada da meia-noite testados).
+- `apps/api/src/schedule/`: `GET/PUT /v1/schedule/weekly`, `GET /v1/schedule/exceptions?from&to`,
+  `PUT/DELETE /v1/schedule/exceptions/:date`, `GET/POST /v1/blocks`, `DELETE /v1/blocks/:id`.
+  Escritas sob `withProfessionalScheduleLock`; leituras sem lock. Conversões banco↔domínio↔API em
+  `schedule.mapper.ts` (`toWeeklySchedule`/`toDomainException` para a 2.7).
+- **Q-26 (decidida pela usuária):** "afetado" = cabia antes e não cabe depois; bloqueio devolve
+  ativos não terminados sobrepostos.
+- Contratos: respostas de escala/exceção/bloqueio, consultas por período (≤ 366 dias),
+  `affectedAppointmentSchema`; `schedulingSettingsUpdateSchema` removido.
+- Para a 2.7 (especialista): ocupação usa `blockEndAt` (não `endAt`), inclui holds e bloqueios, e
+  busca por sobreposição com o dia (`startAt < fim AND blockEndAt > início`); leitura pública sem lock.
+- Fora do escopo, registrado: trocar `timezone` em `PATCH /v1/me` pode tirar agendamentos do
+  horário e hoje não devolve afetados (avaliar com Q-20/Q-26).
+- Próximo: 2.7 (`availability` público + `availability/days`).

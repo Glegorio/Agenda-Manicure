@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@agende/contracts": "workspace:*",
+    "@agende/scheduling": "workspace:*",
     "@nestjs/common": "^12.4.2",
     "@nestjs/core": "^12.4.2",
     "@nestjs/platform-express": "^12.4.2",
