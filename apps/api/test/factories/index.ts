@@ -97,6 +97,36 @@ export function makeFactories(prisma: PrismaService) {
         },
       });
     },
+
+    /** Hold `[startAt, startAt + duração)` com snapshot do serviço (Q-30) e buffer gravado. */
+    hold({
+      professionalId,
+      service,
+      startAt,
+      expiresAt,
+      bufferMin = 10,
+    }: {
+      professionalId: string;
+      service: Service;
+      startAt: Date;
+      expiresAt: Date;
+      bufferMin?: number;
+    }) {
+      const endAt = new Date(startAt.getTime() + service.durationMin * MINUTE);
+      return prisma.slotHold.create({
+        data: {
+          professionalId,
+          serviceId: service.id,
+          serviceNameSnapshot: service.name,
+          priceCentsSnapshot: service.priceCents,
+          startAt,
+          endAt,
+          blockEndAt: new Date(endAt.getTime() + bufferMin * MINUTE),
+          tokenHash: `hash-${String(next())}`,
+          expiresAt,
+        },
+      });
+    },
   };
 }
 

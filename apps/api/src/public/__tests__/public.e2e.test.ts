@@ -236,20 +236,15 @@ describe('GET /v1/public/:slug/availability', () => {
 
   it('T5: hold ativo ocupa; hold expirado não', async () => {
     const { pro, service } = await setupStudio();
-    const hold = (startTime: string, expiresAt: string, token: string) =>
-      prisma.slotHold.create({
-        data: {
-          professionalId: pro.id,
-          serviceId: service.id,
-          startAt: new Date(sp(THURSDAY, startTime)),
-          endAt: new Date(new Date(sp(THURSDAY, startTime)).getTime() + 60 * 60_000),
-          blockEndAt: new Date(new Date(sp(THURSDAY, startTime)).getTime() + 70 * 60_000),
-          tokenHash: token,
-          expiresAt: new Date(expiresAt),
-        },
+    const hold = (startTime: string, expiresAt: string) =>
+      factories.hold({
+        professionalId: pro.id,
+        service,
+        startAt: new Date(sp(THURSDAY, startTime)),
+        expiresAt: new Date(expiresAt),
       });
-    await hold('14:00', '2026-11-12T12:04:00Z', 'ativo');
-    await hold('16:00', '2026-11-12T11:59:00Z', 'expirado');
+    await hold('14:00', '2026-11-12T12:04:00Z');
+    await hold('16:00', '2026-11-12T11:59:00Z');
 
     const { slots } = await slotsOf('studio-ana', service.id);
 

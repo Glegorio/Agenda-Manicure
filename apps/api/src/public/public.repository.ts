@@ -41,6 +41,9 @@ const PUBLIC_SERVICE_SELECT = {
 /** Serviço visível na página pública (RN-91). */
 const VISIBLE = { active: true, public: true } as const;
 
+/** Client global (leituras soltas) ou o `tx` de uma transação sob o lock da agenda (2.8). */
+export type Db = Prisma.TransactionClient;
+
 /**
  * Leituras da página pública. Sem lock (ADR-0003 serializa escritas) e sem dados de clientes:
  * ocupações viram só intervalos (regra de endpoints `public/*`).
@@ -50,8 +53,8 @@ export class PublicRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   /** `slug` é citext: a busca não diferencia maiúsculas (RN-90). */
-  findProfessionalBySlug(slug: string): Promise<PublicProfessional | null> {
-    return this.prisma.professional.findUnique({ where: { slug }, select: PUBLIC_PROFILE_SELECT });
+  findProfessionalBySlug(slug: string, db: Db = this.prisma): Promise<PublicProfessional | null> {
+    return db.professional.findUnique({ where: { slug }, select: PUBLIC_PROFILE_SELECT });
   }
 
   listVisibleServices(professionalId: string) {
@@ -62,22 +65,27 @@ export class PublicRepository {
     });
   }
 
-  findVisibleService(professionalId: string, id: string) {
-    return this.prisma.service.findFirst({
+  findVisibleService(professionalId: string, id: string, db: Db = this.prisma) {
+    return db.service.findFirst({
       where: { id, professionalId, ...VISIBLE },
       select: { id: true, name: true, priceCents: true, durationMin: true },
     });
   }
 
-  listWeekly(professionalId: string): Promise<WindowRow[]> {
-    return this.prisma.weeklyScheduleWindow.findMany({
+  listWeekly(professionalId: string, db: Db = this.prisma): Promise<WindowRow[]> {
+    return db.weeklyScheduleWindow.findMany({
       where: { professionalId },
       select: { weekday: true, startMin: true, endMin: true },
     });
   }
 
-  listExceptions(professionalId: string, from: Date, to: Date): Promise<ExceptionRow[]> {
-    return this.prisma.scheduleException.findMany({
+  listExceptions(
+    professionalId: string,
+    from: Date,
+    to: Date,
+    db: Db = this.prisma,
+  ): Promise<ExceptionRow[]> {
+    return db.scheduleException.findMany({
       where: { professionalId, date: { gte: from, lte: to } },
       include: { windows: { orderBy: { startMin: 'asc' } } },
     });
@@ -92,7 +100,7 @@ export class PublicRepository {
     professionalId: string,
     from: Date,
     to: Date,
-    db: Prisma.TransactionClient = this.prisma,
+    db: Db = this.prisma,
   ): Promise<BusyInterval[]> {
     // Em sequência: dentro de uma transação (2.8) o client não aceita consultas paralelas.
     const appointments = await db.appointment.findMany({

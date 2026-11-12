@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import type { Prisma } from '../generated/prisma/client.js';
 import { PrismaService } from '../prisma/prisma.service.js';
-import { withProfessionalScheduleLock } from '../prisma/schedule-lock.js';
+import { runInScheduleTransaction } from '../prisma/schedule-lock.js';
 import type { AppointmentRow } from './schedule.mapper.js';
 
 export type Tx = Prisma.TransactionClient;
@@ -30,9 +30,7 @@ export class ScheduleRepository {
 
   /** Escritas de disponibilidade concorrem com holds/reservas: mesmo lock (ADR-0003, regra 1). */
   withLock<T>(professionalId: string, fn: (tx: Tx) => Promise<T>): Promise<T> {
-    return this.prisma.$transaction((tx) =>
-      withProfessionalScheduleLock(tx, professionalId, () => fn(tx)),
-    );
+    return runInScheduleTransaction(this.prisma, professionalId, fn);
   }
 
   /** Client fora de transação, para leituras: não disputam o lock com holds/reservas. */

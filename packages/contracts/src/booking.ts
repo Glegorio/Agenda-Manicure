@@ -22,6 +22,22 @@ export const createBookingSchema = z.object({
   notes: z.string().trim().max(500).optional(),
 });
 
+/**
+ * Reserva confirmada (`POST /v1/public/:slug/bookings`, 201). Só dados da própria reserva, para a
+ * tela de sucesso, o `.ics` e o botão do WhatsApp (3.6); nada de outras clientes.
+ */
+export const bookingResponseSchema = z.object({
+  appointmentId: idSchema,
+  startAt: utcInstantSchema,
+  endAt: utcInstantSchema,
+  serviceName: z.string(),
+  priceCents: centsSchema,
+  durationMin: z.int(),
+  /** RN-02a: a web exibe no fuso da profissional. */
+  timezone: z.string(),
+  businessName: z.string(),
+});
+
 const reasonSchema = z.string().trim().max(500).optional();
 
 /**
@@ -47,4 +63,5 @@ export const transitionRequestSchema = z.discriminatedUnion('to', [
 export type CreateHold = z.infer<typeof createHoldSchema>;
 export type HoldResponse = z.infer<typeof holdResponseSchema>;
 export type CreateBooking = z.infer<typeof createBookingSchema>;
+export type BookingResponse = z.infer<typeof bookingResponseSchema>;
 export type TransitionRequest = z.infer<typeof transitionRequestSchema>;

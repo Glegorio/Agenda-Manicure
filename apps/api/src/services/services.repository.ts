@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import type { ServiceInput, ServiceResponse, ServiceUpdate } from '@agende/contracts';
 import type { Prisma } from '../generated/prisma/client.js';
 import { PrismaService } from '../prisma/prisma.service.js';
-import { withProfessionalScheduleLock } from '../prisma/schedule-lock.js';
+import { runInScheduleTransaction } from '../prisma/schedule-lock.js';
 
 const SERVICE_SELECT = {
   id: true,
@@ -43,22 +43,20 @@ export class ServicesRepository {
 
   /** Entra no fim da lista; o lock da profissional evita dois serviços com o mesmo sortOrder. */
   create(professionalId: string, input: ServiceInput): Promise<ServiceResponse> {
-    return this.prisma.$transaction((tx) =>
-      withProfessionalScheduleLock(tx, professionalId, async () => {
-        const { _max } = await tx.service.aggregate({
-          where: { professionalId },
-          _max: { sortOrder: true },
-        });
-        return tx.service.create({
-          data: {
-            ...defined(input),
-            professionalId,
-            sortOrder: (_max.sortOrder ?? -1) + 1,
-          },
-          select: SERVICE_SELECT,
-        });
-      }),
-    );
+    return runInScheduleTransaction(this.prisma, professionalId, async (tx) => {
+      const { _max } = await tx.service.aggregate({
+        where: { professionalId },
+        _max: { sortOrder: true },
+      });
+      return tx.service.create({
+        data: {
+          ...defined(input),
+          professionalId,
+          sortOrder: (_max.sortOrder ?? -1) + 1,
+        },
+        select: SERVICE_SELECT,
+      });
+    });
   }
 
   async update(
@@ -84,24 +82,22 @@ export class ServicesRepository {
     id: string,
     now: Date,
   ): Promise<'DELETED' | 'DEACTIVATED' | 'NOT_FOUND'> {
-    return this.prisma.$transaction((tx) =>
-      withProfessionalScheduleLock(tx, professionalId, async () => {
-        const service = await tx.service.findFirst({
-          where: { id, professionalId },
-          select: {
-            _count: {
-              select: { appointments: true, slotHolds: { where: { expiresAt: { gt: now } } } },
-            },
+    return runInScheduleTransaction(this.prisma, professionalId, async (tx) => {
+      const service = await tx.service.findFirst({
+        where: { id, professionalId },
+        select: {
+          _count: {
+            select: { appointments: true, slotHolds: { where: { expiresAt: { gt: now } } } },
           },
-        });
-        if (!service) return 'NOT_FOUND';
-        if (service._count.appointments > 0 || service._count.slotHolds > 0) {
-          await tx.service.update({ where: { id }, data: { active: false } });
-          return 'DEACTIVATED';
-        }
-        await tx.service.delete({ where: { id } });
-        return 'DELETED';
-      }),
-    );
+        },
+      });
+      if (!service) return 'NOT_FOUND';
+      if (service._count.appointments > 0 || service._count.slotHolds > 0) {
+        await tx.service.update({ where: { id }, data: { active: false } });
+        return 'DEACTIVATED';
+      }
+      await tx.service.delete({ where: { id } });
+      return 'DELETED';
+    });
   }
 }

@@ -218,3 +218,26 @@
   contém `startAt`, `blockEndAt = endAt + buffer atual`, `expiresAt = now + 5 min`);
   `findVisibleService` já traz `name`/`priceCents` para o snapshot (RN-11).
 - Próximo: 2.8 (`holds` + `bookings`, teste de 20 requisições paralelas).
+
+## 2026-11-12 — 2.8 concluída
+
+- `apps/api/src/public/booking.*`: `POST /holds` (RN-40/41), `DELETE /holds/:holdToken` e
+  `POST /bookings` (RN-43/44). Hold revalidado **sob o lock** com tudo lido no `tx` (inclusive a
+  profissional); só aceita `startAt` da grade atual (**Q-28**). Token opaco de 256 bits, só sha256
+  no banco. Confirmação revalida só expiração e constraint (Q-23); 23P01 → 409.
+- **Teste de concorrência verde e estável:** 20 holds paralelos → 1 × 201 e 19 × 409; holds
+  sobrepostos e confirmação dupla também.
+- `runInScheduleTransaction` (`prisma/schedule-lock.ts`): transação + `lock_timeout` + `maxWait`/
+  `timeout` explícitos; P2028/55P03 → `503 SERVICE_UNAVAILABLE`. Escala e serviços migrados para ele.
+- **Q-29 (usuária):** web não altera cadastro de cliente existente; nome digitado em
+  `appointments.booked_name`. RN-81 corrigida em commit separado.
+- **Q-30 (usuária):** hold guarda nome e preço do serviço; a reserva usa esses valores.
+- Migration `20261112180000_booking_snapshots` (descarta holds existentes). **Rode
+  `pnpm --filter api prisma migrate dev` no banco de desenvolvimento.**
+- Para a 2.10 (revisões): rate limit de holds (Q-25) e limite de holds ativos por origem contra
+  quem trava a agenda; job RN-46 sem lock, com o `Clock` e margem de 1 min, `singletonKey`,
+  índice em `expires_at`. Para a 3.5: link da política de privacidade no formulário; orientar a
+  não informar dados de saúde em observações. Para a 8.2: mascarar o token do `DELETE` nos logs.
+- Para a 2.9 (especialista): agendamento manual com `runInScheduleTransaction` e `busyBetween(tx)`;
+  transições com `updateMany where status = from`; SSE só depois do commit.
+- Próximo: 2.9 (`appointments`: lista, manual, transições, SSE).

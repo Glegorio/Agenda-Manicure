@@ -108,6 +108,7 @@ CHECK E.164 (RN-80); unique `(id, professional_id)` para FK composta.
 | cancelled_by          | enum null        |                                         |
 | cancel_reason         | text null        |                                         |
 | status_changed_at     | timestamptz      |                                         |
+| booked_name           | text null        | Q-29: nome digitado na reserva pública  |
 
 **Constraint anti double-booking (SQL cru na migration — Prisma não gera):**
 
@@ -140,7 +141,7 @@ weekday 0–6), `slot_holds` e `manual_blocks` (início < fim).
 
 ### slot_holds
 
-`id, professional_id, service_id, start_at, end_at, block_end_at, token_hash text unique, expires_at timestamptz, created_at` — índice `(professional_id, expires_at)`.
+`id, professional_id, service_id, service_name_snapshot, price_cents_snapshot, start_at, end_at, block_end_at, token_hash text unique, expires_at timestamptz, created_at` — índice `(professional_id, expires_at)`. Snapshot do serviço no hold (Q-30).
 
 ### manual_blocks
 

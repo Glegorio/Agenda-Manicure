@@ -16,7 +16,7 @@ import {
 import { Clock } from '../clock/clock.js';
 import { DomainError } from '../common/domain-error.js';
 import { localDateToDb, toDomainException, toWeeklySchedule } from '../schedule/schedule.mapper.js';
-import { type PublicProfessional, PublicRepository } from './public.repository.js';
+import { type Db, type PublicProfessional, PublicRepository } from './public.repository.js';
 
 const pageNotFound = () => new DomainError('NOT_FOUND', 'Página não encontrada.');
 const serviceNotFound = () => new DomainError('NOT_FOUND', 'Serviço não encontrado.');
@@ -81,20 +81,24 @@ export class PublicService {
     return { timezone: pro.timezone, days: computeAvailableDays(range.from, range.to, query) };
   }
 
-  private async professional(slug: string): Promise<PublicProfessional> {
+  async professional(slug: string, db?: Db): Promise<PublicProfessional> {
     // RN-90: formato inválido não pode existir; 404 sem ir ao banco (citext aceita maiúsculas).
     if (!slugSchema.safeParse(slug.toLowerCase()).success) throw pageNotFound();
-    const pro = await this.repository.findProfessionalBySlug(slug);
+    const pro = await this.repository.findProfessionalBySlug(slug, db);
     if (!pro) throw pageNotFound();
     return pro;
   }
 
+  /** RN-91: inativo, não público ou de outra profissional → mesma resposta (404). */
+  async visibleService(professionalId: string, serviceId: string, db?: Db) {
+    const service = await this.repository.findVisibleService(professionalId, serviceId, db);
+    if (!service) throw serviceNotFound();
+    return service;
+  }
+
   private async professionalAndService(slug: string, serviceId: string) {
     const pro = await this.professional(slug);
-    // RN-91: inativo, não público ou de outra profissional → mesma resposta.
-    const service = await this.repository.findVisibleService(pro.id, serviceId);
-    if (!service) throw serviceNotFound();
-    return { pro, service };
+    return { pro, service: await this.visibleService(pro.id, serviceId) };
   }
 
   /**
@@ -113,23 +117,32 @@ export class PublicService {
     return start <= end ? { from: start, to: end } : null;
   }
 
-  /** Carrega tudo que o domínio precisa para as datas locais `[from, to]`. */
-  private async slotQuery(
+  /**
+   * Carrega tudo que o domínio precisa para as datas locais `[from, to]`. Com `db = tx` (hold,
+   * 2.8) as leituras acontecem sob o lock da agenda; em sequência porque o `tx` não aceita
+   * consultas paralelas.
+   */
+  async slotQuery(
     pro: PublicProfessional,
     durationMin: number,
     from: string,
     to: string,
+    db?: Db,
   ): Promise<Omit<SlotQuery, 'date'>> {
     const tz = pro.timezone;
-    const [weekly, exceptions, busy] = await Promise.all([
-      this.repository.listWeekly(pro.id),
-      this.repository.listExceptions(pro.id, localDateToDb(from), localDateToDb(to)),
-      this.repository.busyBetween(
-        pro.id,
-        localTimeToInstant(addLocalDays(from, -DAY_MARGIN), '00:00', tz),
-        localTimeToInstant(addLocalDays(to, 1 + DAY_MARGIN), '00:00', tz),
-      ),
-    ]);
+    const weekly = await this.repository.listWeekly(pro.id, db);
+    const exceptions = await this.repository.listExceptions(
+      pro.id,
+      localDateToDb(from),
+      localDateToDb(to),
+      db,
+    );
+    const busy = await this.repository.busyBetween(
+      pro.id,
+      localTimeToInstant(addLocalDays(from, -DAY_MARGIN), '00:00', tz),
+      localTimeToInstant(addLocalDays(to, 1 + DAY_MARGIN), '00:00', tz),
+      db,
+    );
 
     return {
       durationMin,

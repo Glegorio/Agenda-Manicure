@@ -44,7 +44,7 @@
 - [x] 2.5 `services` CRUD (RN-10..12)
 - [x] 2.6 `schedule` (semanal, exceções, bloqueios)
 - [x] 2.7 Perfil público `GET /v1/public/:slug` + `availability` público (usa domínio) + `availability/days`
-- [ ] 2.8 `holds` com advisory lock + `bookings` (RN-40..46) — **teste de concorrência**: 20 requisições paralelas no mesmo slot → exatamente 1 sucesso
+- [x] 2.8 `holds` com advisory lock + `bookings` (RN-40..46) — **teste de concorrência**: 20 requisições paralelas no mesmo slot → exatamente 1 sucesso
 - [ ] 2.9 `appointments` (lista, manual, transições, SSE)
 - [ ] 2.10 Job pg-boss de limpeza de holds; formato de erro padrão; rate limit nos públicos
 - [ ] 2.11 OpenAPI gerado a partir dos schemas, publicado em `/docs` no ambiente dev

@@ -294,17 +294,12 @@ describe('DELETE /v1/services/:id', () => {
   );
 
   /** Hold do serviço; o relógio da app de teste está fixo em 2026-11-12T12:00Z. */
-  const createHold = (professionalId: string, serviceId: string, expiresAt: string) =>
-    prisma.slotHold.create({
-      data: {
-        professionalId,
-        serviceId,
-        startAt: new Date('2026-11-13T14:00:00Z'),
-        endAt: new Date('2026-11-13T16:00:00Z'),
-        blockEndAt: new Date('2026-11-13T16:10:00Z'),
-        tokenHash: `hash-${expiresAt}`,
-        expiresAt: new Date(expiresAt),
-      },
+  const createHold = async (professionalId: string, serviceId: string, expiresAt: string) =>
+    factories.hold({
+      professionalId,
+      service: await prisma.service.findUniqueOrThrow({ where: { id: serviceId } }),
+      startAt: new Date('2026-11-13T14:00:00Z'),
+      expiresAt: new Date(expiresAt),
     });
 
   it('Q-23: serviço com hold ativo é desativado (não derruba a reserva)', async () => {
