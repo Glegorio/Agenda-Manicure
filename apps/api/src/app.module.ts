@@ -6,6 +6,7 @@ import { ClockModule } from './clock/clock.module.js';
 import { HealthModule } from './health/health.module.js';
 import { PrismaModule } from './prisma/prisma.module.js';
 import { ProfessionalsModule } from './professionals/professionals.module.js';
+import { PublicModule } from './public/public.module.js';
 import { ScheduleModule } from './schedule/schedule.module.js';
 import { ServicesModule } from './services/services.module.js';
 
@@ -18,6 +19,7 @@ import { ServicesModule } from './services/services.module.js';
     ProfessionalsModule,
     ServicesModule,
     ScheduleModule,
+    PublicModule,
   ],
   providers: [{ provide: APP_FILTER, useClass: ErrorEnvelopeFilter }],
 })

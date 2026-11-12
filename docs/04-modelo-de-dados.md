@@ -44,26 +44,27 @@ professionals 1─┬─* services
 
 ### professionals
 
-| coluna                         | tipo                                                            | notas                               |
-| ------------------------------ | --------------------------------------------------------------- | ----------------------------------- |
-| id                             | uuid                                                            |                                     |
-| email                          | citext unique                                                   | login                               |
-| password_hash                  | text                                                            | argon2id                            |
-| business_name                  | text                                                            |                                     |
-| slug                           | citext unique null                                              | RN-90; nulo até o onboarding (Q-21) |
-| timezone                       | text                                                            | IANA, padrão `America/Sao_Paulo`    |
-| address_line, city, state, zip | text                                                            |                                     |
-| lat, lng                       | double precision null                                           | geolocalização                      |
-| logo_url, cover_url            | text null                                                       |                                     |
-| theme_palette                  | enum `ROSE_GOLD`,`NUDE_MINIMAL`,`ELEGANCE_BLACK`,`PASTEL_LILAC` |                                     |
-| theme_mode                     | enum `LIGHT`,`DARK`,`SYSTEM`                                    |                                     |
-| buffer_min                     | smallint                                                        | 0–60, padrão 10                     |
-| slot_step_min                  | smallint                                                        | 5/10/15/30, padrão 15               |
-| min_notice_min                 | int                                                             | padrão 120                          |
-| booking_horizon_days           | smallint                                                        | padrão 30                           |
-| cancellation_policy            | text                                                            | exibida na etapa 3                  |
-| whatsapp_confirmation_template | text                                                            | com placeholders                    |
-| closing_reminder_offset_min    | smallint                                                        | padrão 30                           |
+| coluna                         | tipo                                                            | notas                                                   |
+| ------------------------------ | --------------------------------------------------------------- | ------------------------------------------------------- |
+| id                             | uuid                                                            |                                                         |
+| email                          | citext unique                                                   | login                                                   |
+| password_hash                  | text                                                            | argon2id                                                |
+| business_name                  | text                                                            |                                                         |
+| slug                           | citext unique null                                              | RN-90; nulo até o onboarding (Q-21)                     |
+| timezone                       | text                                                            | IANA, padrão `America/Sao_Paulo`                        |
+| show_full_address              | boolean, padrão false                                           | Q-27: endereço completo na página pública só com opt-in |
+| address_line, city, state, zip | text                                                            |                                                         |
+| lat, lng                       | double precision null                                           | geolocalização                                          |
+| logo_url, cover_url            | text null                                                       |                                                         |
+| theme_palette                  | enum `ROSE_GOLD`,`NUDE_MINIMAL`,`ELEGANCE_BLACK`,`PASTEL_LILAC` |                                                         |
+| theme_mode                     | enum `LIGHT`,`DARK`,`SYSTEM`                                    |                                                         |
+| buffer_min                     | smallint                                                        | 0–60, padrão 10                                         |
+| slot_step_min                  | smallint                                                        | 5/10/15/30, padrão 15                                   |
+| min_notice_min                 | int                                                             | padrão 120                                              |
+| booking_horizon_days           | smallint                                                        | padrão 30                                               |
+| cancellation_policy            | text                                                            | exibida na etapa 3                                      |
+| whatsapp_confirmation_template | text                                                            | com placeholders                                        |
+| closing_reminder_offset_min    | smallint                                                        | padrão 30                                               |
 
 ### services
 

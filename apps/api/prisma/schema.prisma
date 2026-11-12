@@ -68,6 +68,8 @@ model Professional {
   /// IANA (RN-02)
   timezone                     String       @default("America/Sao_Paulo")
   addressLine                  String?      @map("address_line")
+  /// Q-27: a página pública mostra `address_line` só com opt-in (padrão: só cidade/UF)
+  showFullAddress              Boolean      @default(false) @map("show_full_address")
   city                         String?
   state                        String?
   zip                          String?

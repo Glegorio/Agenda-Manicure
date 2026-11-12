@@ -198,3 +198,23 @@
 - Fora do escopo, registrado: trocar `timezone` em `PATCH /v1/me` pode tirar agendamentos do
   horário e hoje não devolve afetados (avaliar com Q-20/Q-26).
 - Próximo: 2.7 (`availability` público + `availability/days`).
+
+## 2026-11-12 — 2.7 concluída
+
+- Escopo ampliado com aval da usuária: perfil público `GET /v1/public/:slug` entrou na 2.7.
+- `apps/api/src/public/`: perfil (RN-91/92, sem e-mail/CEP/coordenadas), `availability` e
+  `availability/days` (sem login, sem lock, `Cache-Control: no-store`). Slug malformado → 404 sem
+  ir ao banco; período recortado em [hoje, hoje + horizonte] antes das consultas (RN-33).
+- Ocupações por sobreposição com `blockEndAt` gravado + holds (expirados descartados no domínio) +
+  bloqueios. `busyBetween(..., db)` aceita o `tx` e consulta em sequência (pronto para a 2.8).
+- `packages/scheduling`: `computeAvailableDays` (pura), com T8 em Nova York.
+- **Q-27 (decidida pela usuária):** endereço completo só com opt-in — coluna `show_full_address`
+  (migration `20261112150000_show_full_address`, padrão `false`), editável em `PATCH /v1/me`.
+  **Rode `pnpm --filter api prisma migrate dev` no banco de desenvolvimento.**
+- **Pergunta aberta para a 2.8 (do especialista):** encaixe RN-34 fora da grade que deixa de existir
+  entre a consulta e o hold. Recomendação: o hold só aceita horário presente em
+  `computeAvailableSlots` (409 raro, UI recarrega). Decidir antes de implementar.
+- Para a 2.8: revalidar dentro do lock com `tx` (`localDateOf(startAt)`, `computeAvailableSlots`
+  contém `startAt`, `blockEndAt = endAt + buffer atual`, `expiresAt = now + 5 min`);
+  `findVisibleService` já traz `name`/`priceCents` para o snapshot (RN-11).
+- Próximo: 2.8 (`holds` + `bookings`, teste de 20 requisições paralelas).

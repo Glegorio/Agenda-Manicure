@@ -49,6 +49,7 @@ describe('GET /v1/me', () => {
       timezone: 'America/Sao_Paulo',
       themePalette: 'ROSE_GOLD',
       themeMode: 'SYSTEM',
+      showFullAddress: false, // Q-27: padrão é não mostrar
       bufferMin: 10,
       slotStepMin: 15,
       minNoticeMin: 120,
@@ -93,6 +94,7 @@ describe('PATCH /v1/me', () => {
         lng: -60.02,
         themePalette: 'PASTEL_LILAC',
         themeMode: 'DARK',
+        showFullAddress: true,
         cancellationPolicy: 'Avise com 24 horas.',
         bufferMin: 15,
         slotStepMin: 30,

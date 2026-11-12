@@ -40,14 +40,14 @@ erros inesperados viram `500 INTERNAL_ERROR` sem expor a mensagem interna.
 
 ## Público (booking web, sem auth)
 
-| Método | Rota                                                       | Descrição                                                                    |
-| ------ | ---------------------------------------------------------- | ---------------------------------------------------------------------------- |
-| GET    | `/v1/public/:slug`                                         | Perfil público, tema, política de cancelamento, serviços públicos            |
-| GET    | `/v1/public/:slug/availability?serviceId=&date=YYYY-MM-DD` | Slots do dia (UTC) + `timezone`                                              |
-| GET    | `/v1/public/:slug/availability/days?serviceId=&from=&to=`  | Dias com ao menos 1 slot (para o calendário)                                 |
-| POST   | `/v1/public/:slug/holds`                                   | `{serviceId, startAt}` → `{holdToken, expiresAt}` · 409 se ocupado           |
-| DELETE | `/v1/public/:slug/holds/:holdToken`                        | Libera o hold (cliente voltou)                                               |
-| POST   | `/v1/public/:slug/bookings`                                | `{holdToken, name, phone, notes?}` → agendamento confirmado · 410 se expirou |
+| Método | Rota                                                       | Descrição                                                                                                                                                                                                                        |
+| ------ | ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| GET    | `/v1/public/:slug`                                         | `publicProfileResponseSchema`: nome, fuso, cidade/UF (endereço completo só com `showFullAddress`, Q-27), tema, política (RN-92) e serviços `active && public` (RN-91); sem e-mail, CEP ou coordenadas · 404 se o slug não existe |
+| GET    | `/v1/public/:slug/availability?serviceId=&date=YYYY-MM-DD` | Slots do dia (UTC) + `timezone` (RN-30..36, RN-02a) · 404 se o serviço não é visível · `Cache-Control: no-store`                                                                                                                 |
+| GET    | `/v1/public/:slug/availability/days?serviceId=&from=&to=`  | Dias com ao menos 1 slot (calendário), período < 62 dias, recortado em [hoje, hoje + horizonte] · 404 se o serviço não é visível                                                                                                 |
+| POST   | `/v1/public/:slug/holds`                                   | `{serviceId, startAt}` → `{holdToken, expiresAt}` · 409 se ocupado                                                                                                                                                               |
+| DELETE | `/v1/public/:slug/holds/:holdToken`                        | Libera o hold (cliente voltou)                                                                                                                                                                                                   |
+| POST   | `/v1/public/:slug/bookings`                                | `{holdToken, name, phone, notes?}` → agendamento confirmado · 410 se expirou                                                                                                                                                     |
 
 ## Autenticação (`/v1/auth`, pública — ADR-0009)
 

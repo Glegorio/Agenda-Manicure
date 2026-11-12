@@ -47,6 +47,8 @@ export const professionalProfileSchema = schedulingSettingsSchema.extend({
   businessName: z.string(),
   slug: z.string().nullable(),
   addressLine: z.string().nullable(),
+  /** Q-27: a página pública mostra `addressLine` só com opt-in. */
+  showFullAddress: z.boolean(),
   city: z.string().nullable(),
   state: z.string().nullable(),
   zip: z.string().nullable(),
@@ -71,6 +73,7 @@ export const professionalUpdateSchema = schedulingSettingsSchema
     businessName: z.string().trim().min(1, 'Informe o nome do seu negócio.').max(80).optional(),
     slug: slugSchema.optional(),
     addressLine: optionalText(200).optional(),
+    showFullAddress: z.boolean().optional(),
     city: optionalText(100).optional(),
     state: stateSchema.optional(),
     zip: zipSchema.optional(),

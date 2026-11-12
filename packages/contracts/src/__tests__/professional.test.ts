@@ -89,6 +89,7 @@ describe('professionalProfileSchema', () => {
         slug: null,
         timezone: 'America/Sao_Paulo',
         addressLine: null,
+        showFullAddress: false,
         city: null,
         state: null,
         zip: null,

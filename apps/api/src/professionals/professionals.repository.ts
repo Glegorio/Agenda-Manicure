@@ -15,6 +15,7 @@ const PROFILE_SELECT = {
   slug: true,
   timezone: true,
   addressLine: true,
+  showFullAddress: true,
   city: true,
   state: true,
   zip: true,
