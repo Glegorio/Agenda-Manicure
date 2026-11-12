@@ -6,9 +6,17 @@ import { ClockModule } from './clock/clock.module.js';
 import { HealthModule } from './health/health.module.js';
 import { PrismaModule } from './prisma/prisma.module.js';
 import { ProfessionalsModule } from './professionals/professionals.module.js';
+import { ServicesModule } from './services/services.module.js';
 
 @Module({
-  imports: [PrismaModule, ClockModule, AuthModule, HealthModule, ProfessionalsModule],
+  imports: [
+    PrismaModule,
+    ClockModule,
+    AuthModule,
+    HealthModule,
+    ProfessionalsModule,
+    ServicesModule,
+  ],
   providers: [{ provide: APP_FILTER, useClass: ErrorEnvelopeFilter }],
 })
 export class AppModule {}

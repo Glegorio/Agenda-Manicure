@@ -31,6 +31,21 @@ export const serviceUpdateSchema = serviceInputSchema
 
 export const serviceSchema = serviceInputSchema.extend({ id: idSchema });
 
+/** Serviço como a API devolve (`/v1/services`): campos explícitos, nulos como `null`. */
+export const serviceResponseSchema = serviceInputSchema.extend({
+  id: idSchema,
+  description: z.string().nullable(),
+  imageUrl: z.string().nullable(),
+  sortOrder: z.int(),
+});
+
+/** `DELETE /v1/services/:id` — Q-24: apaga se nunca foi usado; senão desativa (RN-12). */
+export const serviceDeleteResponseSchema = z.object({
+  outcome: z.enum(['DELETED', 'DEACTIVATED']),
+});
+
 export type ServiceInput = z.infer<typeof serviceInputSchema>;
+export type ServiceResponse = z.infer<typeof serviceResponseSchema>;
+export type ServiceDeleteResponse = z.infer<typeof serviceDeleteResponseSchema>;
 export type ServiceUpdate = z.infer<typeof serviceUpdateSchema>;
 export type Service = z.infer<typeof serviceSchema>;

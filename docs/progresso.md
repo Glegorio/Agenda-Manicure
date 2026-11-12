@@ -163,3 +163,19 @@
 - Fora do escopo: logo/capa (Q-09), template de WhatsApp (5.2), troca de e-mail/senha.
 - Débito: `schedulingSettingsUpdateSchema` (contracts) ficou sem uso; remover quando a 2.6 confirmar.
 - Próximo: 2.5 (`services` CRUD, RN-10..12).
+
+## 2026-11-12 — 2.5 concluída
+
+- `apps/api/src/services/`: CRUD `/v1/services` (RN-10..12), escopo pelo token (outra profissional
+  → 404). Lista inclui inativos por `sortOrder`; novo serviço entra no fim. `DELETE` → `200 { outcome }`:
+  apaga se não houver agendamento (qualquer status) nem hold ativo; senão desativa (Q-24 atualizada, Q-23).
+- `withProfessionalScheduleLock(tx, professionalId, fn)` criado (ADR-0003, regra 1) em
+  `apps/api/src/prisma/schedule-lock.ts`; o tipo recusa o client global (`$connect?: never`, checado
+  por `@ts-expect-error`). Teste determinístico via `pg_locks` (sem timer), incluindo rollback.
+- Helper `test/auth.ts` (`signUp`) para testes autenticados.
+- Para a 2.8 (do especialista-agenda): ler o serviço **depois** do lock ao criar hold (FK com o
+  DELETE concorrente); definir `maxWait`/`timeout` nas transações de agenda e mapear `P2028`, senão o
+  teste de 20 paralelas pode virar 500 em CI lenta (pool padrão de 10 conexões); SSE só após commit.
+- Débitos: `serviceSchema` (contracts) duplica `serviceResponseSchema`; helper `defined()` repetido
+  em professionals/services (extrair no 3º uso).
+- Próximo: 2.6 (`schedule`: semanal, exceções, bloqueios).

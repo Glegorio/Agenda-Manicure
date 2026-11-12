@@ -1,6 +1,5 @@
 import type { INestApplication } from '@nestjs/common';
 import {
-  authSessionResponseSchema,
   errorResponseSchema,
   professionalProfileSchema,
   slugAvailabilityResponseSchema,
@@ -9,6 +8,7 @@ import request from 'supertest';
 import type { App } from 'supertest/types.js';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { createTestApp } from '../../../test/app.js';
+import { signUp as signUpHelper } from '../../../test/auth.js';
 import { createTestPrisma, resetDatabase } from '../../../test/database.js';
 import { makeFactories } from '../../../test/factories/index.js';
 
@@ -19,15 +19,8 @@ let app: INestApplication<App>;
 const http = () => request(app.getHttpServer());
 const errorCode = (body: unknown) => errorResponseSchema.parse(body).error.code;
 
-/** Cadastra pela API para ter um access token real. */
-async function signUp(email = 'ana@exemplo.com.br', slug?: string) {
-  const res = await http()
-    .post('/v1/auth/register')
-    .send({ email, password: 'senha-segura-123', businessName: 'Studio Ana', slug })
-    .expect(201);
-  const session = authSessionResponseSchema.parse(res.body);
-  return { id: session.professional.id, auth: `Bearer ${session.accessToken}` };
-}
+const signUp = (email = 'ana@exemplo.com.br', slug?: string) =>
+  signUpHelper(app, { email, ...(slug === undefined ? {} : { slug }) });
 
 beforeAll(async () => {
   app = await createTestApp();
