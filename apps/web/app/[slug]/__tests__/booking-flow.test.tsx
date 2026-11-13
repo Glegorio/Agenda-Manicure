@@ -39,6 +39,7 @@ function fakeApi(overrides: Partial<PublicClient> = {}): PublicClient {
       .fn()
       .mockResolvedValue({ hold: holdResponse, serverDate: new Date('2026-11-13T12:00:00Z') }),
     releaseHold: vi.fn().mockResolvedValue(undefined),
+    createBooking: vi.fn(),
     ...overrides,
   };
 }

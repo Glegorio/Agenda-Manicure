@@ -93,4 +93,37 @@ describe('public-client', () => {
       .catch((e: unknown) => e);
     expect(error).toMatchObject({ status: 502, code: 'UNKNOWN' });
   });
+
+  it('RN-43: confirma a reserva com POST bookings', async () => {
+    const booking = { appointmentId: SERVICE };
+    const fetchMock = vi.fn().mockResolvedValue(json(201, booking));
+    const input = { holdToken: 'x'.repeat(43), name: 'Maria Souza', phone: '+5511999998888' };
+
+    const res = await createPublicClient('http://api/v1', fetchMock).createBooking(
+      'studio-ana',
+      input,
+    );
+
+    expect(res).toEqual(booking);
+    const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+    expect(url).toBe('http://api/v1/public/studio-ana/bookings');
+    expect(init.method).toBe('POST');
+    expect(JSON.parse(init.body as string)).toEqual(input);
+  });
+
+  it('RN-44: 410 na reserva vira ApiError HOLD_EXPIRED', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValue(
+        json(410, { error: { code: 'HOLD_EXPIRED', message: 'Expirou.', details: {} } }),
+      );
+    const error = await createPublicClient('http://api/v1', fetchMock)
+      .createBooking('studio-ana', {
+        holdToken: 'x'.repeat(43),
+        name: 'Maria',
+        phone: '+5511999998888',
+      })
+      .catch((e: unknown) => e);
+    expect(error).toMatchObject({ status: 410, code: 'HOLD_EXPIRED' });
+  });
 });

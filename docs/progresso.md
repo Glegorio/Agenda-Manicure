@@ -344,3 +344,24 @@
   > body/header ou cortar do log na 8.2); `releaseHold` ignora falha (3.7); margem de ~2 s no contador
   > (3.5); "Trocar serviço" não libera hold ativo.
 - Próximo: 3.5 (formulário, máscara de telefone, contador do hold, política de cancelamento).
+
+## 2026-11-13 — 3.5 concluída
+
+- `BookingForm`: nome, WhatsApp com máscara BR → E.164 (`lib/phone.ts`, DDD válido, celular com 9,
+  fixo [2-5], `+55`/`0` colados; DDD 55 não é confundido com código do país), observações ≤ 500 com
+  contador e orientação sobre saúde; consentimento só com observações e zerado quando elas são
+  apagadas (Q-34); política de cancelamento antes do CTA, escondida se nula (Q-35, RN-92); link para
+  `/privacidade` em nova aba (Q-33, texto provisório, controladora = profissional).
+- Contador do hold no relógio do servidor com margem de 2 s (`lib/countdown.ts`); leitor de tela só
+  avisa no último minuto. Zerou, 410 ou 409 → volta à etapa 2 com aviso, foco no aviso e dados
+  digitados mantidos em memória (RN-44). Confirmação mínima (tela completa na 3.6). Duplo envio
+  bloqueado por ref.
+- Revisões: sem 🔴. Corrigidos 🟡: máscara com DDD 55, consentimento persistente, tela travada em
+  0:00 após envio com erro de rede, teste de duplo envio que não provava nada, erros que não sumiam
+  ao corrigir, campos obrigatórios, alvo de toque do consentimento, folga da barra fixa a 200%.
+- Pendências: **8.1** — consentimento de saúde só existe na UI (API aceita `notes` sem aceite; gravar
+  `notes_consent_at` + versão do texto); logs da API não podem gravar corpo/telefone. **8.5** — texto
+  final da privacidade com versão, bases legais, retenção, contato da profissional, exportar/excluir.
+  **3.7** — reenvio após resposta perdida pode virar 410 mesmo com a reserva criada (sem
+  idempotência); "Trocar serviço" não libera hold. Observações nunca em templates de WhatsApp (fase 5).
+- Próximo: 3.6 (tela de sucesso, `wa.me` sem número — Q-32 — e `.ics`).

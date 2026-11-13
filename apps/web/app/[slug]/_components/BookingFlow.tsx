@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import type { BookingResponse } from '@agende/contracts';
 import { formatBRL } from '@agende/money';
 import { ApiError, createPublicClient, type PublicClient } from '../../../lib/api/public-client';
 import {
@@ -20,6 +21,7 @@ import { publicApiBaseUrl } from '../../../lib/env';
 import { formatDuration } from '../../../lib/format';
 import { clearHold, loadHold, saveHold, type StoredHold } from '../../../lib/hold-storage';
 import styles from './BookingFlow.module.css';
+import { BookingForm, EMPTY_FORM, SLOT_TAKEN_MESSAGE, type FormValues } from './BookingForm';
 
 interface Service {
   id: string;
@@ -40,6 +42,8 @@ interface Props {
   api?: PublicClient | undefined;
   /** Injetável para teste; padrão: fuso do navegador. */
   browserTimeZone?: string | undefined;
+  /** RN-92 / Q-35: exibida na etapa 3; `null` esconde a seção. */
+  cancellationPolicy?: string | null | undefined;
 }
 
 /** Resultado de uma consulta, indexado por ela: consulta nova = carregando, sem setState no effect. */
@@ -48,7 +52,6 @@ type Result<T> = { key: string; data: T } | { key: string; error: string };
 /** Quantos meses à frente o calendário navega (a API corta pelo horizonte, RN-33). */
 const MAX_MONTHS_AHEAD = 2;
 const WEEKDAYS = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
-const SLOT_TAKEN = 'Esse horário acabou de ser reservado por outra pessoa. Escolha outro horário.';
 const NETWORK_ERROR = 'Não foi possível falar com a agenda. Verifique a conexão e tente de novo.';
 
 const errorMessage = (error: unknown) =>
@@ -72,6 +75,7 @@ export function BookingFlow({
   initialSlot,
   api: injectedApi,
   browserTimeZone,
+  cancellationPolicy = null,
 }: Props) {
   const api = useMemo(() => injectedApi ?? createPublicClient(publicApiBaseUrl()), [injectedApi]);
 
@@ -96,10 +100,15 @@ export function BookingFlow({
     return isValidHold(stored, initialSlot, service.id) ? stored : null;
   });
 
+  // Dados digitados sobrevivem à volta para a etapa 2 (RN-44: hold expirado, novo horário);
+  // ficam só em memória, nunca na sessionStorage.
+  const [formValues, setFormValues] = useState<FormValues>(EMPTY_FORM);
+  const [booked, setBooked] = useState<BookingResponse | null>(null);
+
   const alertRef = useRef<HTMLParagraphElement>(null);
   const dateTitleRef = useRef<HTMLHeadingElement>(null);
-  const heldTitleRef = useRef<HTMLHeadingElement>(null);
-  const focusDateTitle = useRef(false);
+  const bookedTitleRef = useRef<HTMLHeadingElement>(null);
+  const focusAfterHold = useRef<'date' | 'alert' | null>(null);
 
   const daysFrom = `${month}-01` < today ? today : `${month}-01`;
   const daysKey = `${daysFrom}/${lastDayOfMonth(month)}#${String(daysVersion)}`;
@@ -150,15 +159,18 @@ export function BookingFlow({
     };
   }, [api, slug, service.id, slotsKey]);
 
-  // Foco acompanha a mudança de tela: resumo do hold ou volta à escolha do dia.
+  // Foco acompanha a mudança de tela (o formulário foca o próprio título).
   useEffect(() => {
-    if (held) {
-      heldTitleRef.current?.focus();
-    } else if (focusDateTitle.current) {
-      focusDateTitle.current = false;
-      dateTitleRef.current?.focus();
-    }
+    if (held) return;
+    const target = focusAfterHold.current;
+    focusAfterHold.current = null;
+    if (target === 'date') dateTitleRef.current?.focus();
+    if (target === 'alert') alertRef.current?.focus();
   }, [held]);
+
+  useEffect(() => {
+    if (booked) bookedTitleRef.current?.focus();
+  }, [booked]);
 
   // Voltar/avançar do navegador: a tela segue a URL; sair da etapa 3 libera o hold.
   useEffect(() => {
@@ -220,7 +232,7 @@ export function BookingFlow({
       window.history.pushState(null, '', urlFor({ date, slot: hold.startAt }));
     } catch (e) {
       const takenNow = e instanceof ApiError && e.code === 'SLOT_UNAVAILABLE';
-      setActionError(takenNow ? SLOT_TAKEN : errorMessage(e));
+      setActionError(takenNow ? SLOT_TAKEN_MESSAGE : errorMessage(e));
       if (takenNow) {
         setSelected(null);
         setSlotsVersion((v) => v + 1);
@@ -236,34 +248,70 @@ export function BookingFlow({
       clearHold(slug);
       await api.releaseHold(slug, held.holdToken).catch(() => undefined);
     }
-    focusDateTitle.current = true;
+    focusAfterHold.current = 'date';
     setHeld(null);
     setSelected(null);
     setSlotsVersion((v) => v + 1);
     window.history.replaceState(null, '', urlFor(date ? { date } : {}));
   }
 
-  if (held) {
+  /** Hold perdido na etapa 3 (expirou, 410 ou 409): volta à etapa 2 com aviso e grade nova. */
+  const holdLost = useCallback(
+    (message: string) => {
+      const stored = loadHold(slug);
+      clearHold(slug);
+      // 409 mantém o hold no banco até expirar (rollback): libera para não travar o horário.
+      if (stored) void api.releaseHold(slug, stored.holdToken).catch(() => undefined);
+      focusAfterHold.current = 'alert';
+      setHeld(null);
+      setSelected(null);
+      setActionError(message);
+      setSlotsVersion((v) => v + 1);
+      window.history.replaceState(null, '', urlFor(date ? { date } : {}));
+    },
+    // urlFor depende só de slug e service.id.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [api, slug, service.id, date],
+  );
+
+  function handleBooked(booking: BookingResponse) {
+    clearHold(slug);
+    setBooked(booking);
+  }
+
+  if (booked) {
     return (
-      <section className={styles.section} aria-labelledby="held-title">
-        <h2 id="held-title" ref={heldTitleRef} tabIndex={-1} className={styles.title}>
-          Horário reservado por 5 minutos
+      <section className={styles.section} aria-labelledby="booked-title">
+        <h2 id="booked-title" ref={bookedTitleRef} tabIndex={-1} className={styles.title}>
+          Agendamento confirmado!
         </h2>
+        {/* Tela de sucesso completa (WhatsApp, .ics) na 3.6. */}
         <dl className={styles.summary}>
           <dt>Serviço</dt>
-          <dd>{held.serviceName}</dd>
+          <dd>{booked.serviceName}</dd>
           <dt>Quando</dt>
-          <dd>{formatSlotLabel(held.startAt, timezone)}</dd>
-          <dt>Duração</dt>
-          <dd>{formatDuration(held.durationMin)}</dd>
+          <dd>{formatSlotLabel(booked.startAt, timezone)}</dd>
           <dt>Valor</dt>
-          <dd>{formatBRL(held.priceCents)}</dd>
+          <dd>{formatBRL(booked.priceCents)}</dd>
         </dl>
-        {/* Formulário da etapa 3 chega na 3.5. */}
-        <button type="button" className={styles.secondary} onClick={() => void chooseAnotherSlot()}>
-          Escolher outro horário
-        </button>
       </section>
+    );
+  }
+
+  if (held) {
+    return (
+      <BookingForm
+        slug={slug}
+        timezone={timezone}
+        held={held}
+        cancellationPolicy={cancellationPolicy}
+        api={api}
+        values={formValues}
+        onChange={setFormValues}
+        onLost={holdLost}
+        onBooked={handleBooked}
+        onChooseAnother={() => void chooseAnotherSlot()}
+      />
     );
   }
 

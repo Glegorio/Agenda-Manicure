@@ -2,6 +2,8 @@
 import type {
   AvailabilityDaysResponse,
   AvailabilityResponse,
+  BookingResponse,
+  CreateBooking,
   ErrorResponse,
   HoldResponse,
 } from '@agende/contracts';
@@ -47,6 +49,8 @@ export interface PublicClient {
     startAt: string,
   ) => Promise<{ hold: HoldResponse; serverDate: Date | null }>;
   releaseHold: (slug: string, holdToken: string) => Promise<void>;
+  /** RN-43: confirma o hold. 410 se expirou (RN-44), 409 se a constraint barrar (RN-42). */
+  createBooking: (slug: string, input: CreateBooking) => Promise<BookingResponse>;
 }
 
 /** Cliente da API pública chamado do navegador (CORS, Q-39). Horários nunca vêm de cache. */
@@ -87,6 +91,17 @@ export function createPublicClient(baseUrl: string, fetchImpl: typeof fetch = fe
         method: 'DELETE',
         keepalive: true,
       });
+    },
+
+    async createBooking(slug, input) {
+      const response = await fetchImpl(`${baseUrl}/public/${enc(slug)}/bookings`, {
+        method: 'POST',
+        cache: 'no-store',
+        headers: { 'content-type': 'application/json', accept: 'application/json' },
+        body: JSON.stringify(input),
+      });
+      if (!response.ok) throw await toApiError(response);
+      return (await response.json()) as BookingResponse;
     },
   };
 }
