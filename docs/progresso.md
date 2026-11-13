@@ -422,3 +422,22 @@
   inexistente em manifest/ícone chama a API a cada pedido (404 não entra no cache do Next) — rate
   limit do lado web na 8.4.
 - Próximo: 3.9 (Playwright: fluxo feliz, slot tomado, hold expirado; axe; job na CI — Q-38).
+
+## 2026-11-13 — 3.9 concluída
+
+- `apps/web/playwright.config.ts` + `e2e/`: sobe a API (3334, `agende_test`, migrate deploy, rate
+  limit/jobs desligados, segredo de teste) e a web em build de produção (3100). Profissional criada
+  **pela API** com slug aleatório por teste; hold expirado via `pg`. Guarda: só roda em banco
+  `*_test` (`e2e/env.ts`).
+- Specs: fluxo feliz; RN-41 (409 real, aviso com foco, horário some da grade na tela); RN-44 (410
+  real, volta à etapa 2 com nome e telefone); axe WCAG 2.1 AA sem violações nas etapas 1–3 e no
+  sucesso, claro e escuro; offline (horários vistos online não ficam em cache; página offline).
+  Dias escolhidos depois de hoje (o 1º horário de hoje pode sumir em segundos). 6/6 verdes, estável
+  em 6 rodadas locais (~20 s).
+- CI: job `e2e` com Postgres próprio e Chromium (Q-38). `pnpm --filter web test:e2e` no CLAUDE.md.
+- Revisão: sem 🔴; corrigidos dia instável, regex do contador, 409 provado na UI, teste offline que
+  passava sem a regra, guarda do banco.
+- Pendências: subir relatório/trace do Playwright como artifact na CI quando falhar; banco dedicado
+  `agende_e2e` (hoje divide `agende_test` com a suíte da API — não rodar juntas); axe nas outras
+  paletas e nos estados de erro; teste de RN-02a com navegador em outro fuso.
+- Próximo: 3.10 (Lighthouse mobile — LCP < 2,5 s, TBT ≤ 200 ms no lugar de TTI, Q-37).

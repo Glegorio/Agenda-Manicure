@@ -61,7 +61,7 @@
 - [x] 3.6 Tela de sucesso + botão `wa.me` + "adicionar ao calendário" (.ics)
 - [x] 3.7 Tratamento de 409/410 com volta à etapa 2
 - [x] 3.8 PWA: manifest, ícones, service worker com cache de shell (sem cachear slots)
-- [ ] 3.9 Playwright: fluxo feliz, slot tomado, hold expirado; axe-core sem violações
+- [x] 3.9 Playwright: fluxo feliz, slot tomado, hold expirado; axe-core sem violações
 - [ ] 3.10 Lighthouse mobile (Slow 4G) — LCP < 2,5 s, TTI < 2 s na rota pública
 
 ## Fase 4 — App mobile: configuração e Agenda Hub (`apps/mobile`)

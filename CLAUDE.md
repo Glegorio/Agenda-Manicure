@@ -29,6 +29,8 @@ pnpm --filter web dev           # só a web (Next/Turbopack)
 pnpm --filter mobile start      # só o Expo
 pnpm test                       # todos os testes (Turbo)
 pnpm --filter @agende/contracts test   # um pacote (nome do package.json)
+pnpm --filter web test:e2e      # Playwright + axe (API :3334, web :3100, banco agende_test;
+                                # não rode junto com `pnpm --filter api test`, que faz TRUNCATE)
 pnpm lint && pnpm typecheck
 pnpm build
 pnpm format                     # Prettier (format:check roda na CI)

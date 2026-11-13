@@ -78,3 +78,58 @@ jobs:
 
       - name: Build
         run: pnpm build
+
+  e2e:
+    # Q-38: Playwright + axe contra a API real e a web em build de produção (3.9).
+    name: e2e (Playwright + axe)
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    services:
+      postgres:
+        image: postgres:16.15-alpine
+        env:
+          POSTGRES_USER: agende
+          POSTGRES_PASSWORD: agende
+          POSTGRES_DB: agende_test
+          TZ: UTC
+          PGTZ: UTC
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U agende -d agende_test"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+
+    env:
+      TZ: UTC
+      E2E_DATABASE_URL: postgresql://agende:agende@localhost:5432/agende_test?schema=public
+      TURBO_TELEMETRY_DISABLED: 1
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Instalar dependências
+        run: pnpm install --frozen-lockfile
+
+      - name: Preparar banco de teste (extensões)
+        env:
+          PGPASSWORD: agende
+        run: |
+          psql -h localhost -U agende -d agende_test -v ON_ERROR_STOP=1 \
+            -c 'CREATE EXTENSION IF NOT EXISTS btree_gist;' \
+            -c 'CREATE EXTENSION IF NOT EXISTS citext;'
+
+      - name: Instalar Chromium
+        run: pnpm --filter web exec playwright install --with-deps chromium
+
+      - name: E2E
+        run: pnpm --filter web test:e2e
