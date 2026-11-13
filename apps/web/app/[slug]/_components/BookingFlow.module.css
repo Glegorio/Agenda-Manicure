@@ -1,0 +1,232 @@
+.section {
+  display: grid;
+  gap: var(--space-3);
+  /* Espaço para a barra fixa do CTA não cobrir o conteúdo. */
+  padding: 0 var(--space-4) calc(var(--touch-target) + var(--space-7) + var(--space-5));
+}
+
+.title {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  color: var(--color-text-primary);
+}
+
+.service {
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+.link {
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  min-height: var(--touch-target);
+  color: var(--color-primary);
+}
+
+.title:focus-visible,
+.error:focus-visible,
+.link:focus-visible,
+.navButton:focus-visible,
+.day:focus-visible,
+.slot:focus-visible,
+.primary:focus-visible,
+.secondary:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.notice {
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+.error {
+  margin: 0;
+  padding: var(--space-3);
+  border: 1px solid var(--color-danger);
+  border-radius: var(--radius-md);
+  color: var(--color-danger);
+}
+
+.calendar {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.monthNav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.monthLabel {
+  margin: 0;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.navButton {
+  min-width: var(--touch-target);
+  min-height: var(--touch-target);
+  border: none;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-xl);
+  cursor: pointer;
+}
+
+.navButton:disabled {
+  color: var(--color-muted);
+  cursor: default;
+}
+
+.weekdays,
+.days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: var(--space-1);
+  text-align: center;
+}
+
+.weekdays {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.day {
+  min-height: var(--touch-target);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-md);
+  cursor: pointer;
+}
+
+/* Dia sem vaga: sem borda e riscado — a cor não é o único indicador. */
+.day:disabled {
+  border-color: transparent;
+  background: transparent;
+  color: var(--color-muted);
+  text-decoration: line-through;
+  cursor: default;
+}
+
+.days[aria-busy='true'] .day:disabled {
+  text-decoration: none;
+}
+
+/* Selecionado: cor + borda + ✓ (cor não é o único indicador). */
+.day[aria-pressed='true'],
+.slot[aria-pressed='true'] {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  font-weight: 600;
+}
+
+.slot[aria-pressed='true']::after {
+  content: ' ✓';
+}
+
+.slots {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(5.5rem, 1fr));
+  gap: var(--space-2);
+}
+
+.slot {
+  min-height: var(--touch-target);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-md);
+  cursor: pointer;
+}
+
+.bottomBar {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1;
+  padding: var(--space-3) max(var(--space-4), env(safe-area-inset-right))
+    max(var(--space-3), env(safe-area-inset-bottom)) max(var(--space-4), env(safe-area-inset-left));
+  border-top: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+.primary,
+.secondary {
+  width: 100%;
+  max-width: 40rem;
+  min-height: var(--touch-target);
+  margin: 0 auto;
+  display: block;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-md);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.primary {
+  border: none;
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+}
+
+.primary:disabled {
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  cursor: default;
+}
+
+.hint {
+  max-width: 40rem;
+  margin: 0 auto var(--space-2);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+
+.retry {
+  display: grid;
+  gap: var(--space-2);
+}
+
+/* Região viva vazia: continua no DOM (para anunciar depois), sem ocupar espaço. */
+.liveEmpty {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.secondary {
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+}
+
+.summary {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--space-2) var(--space-4);
+  margin: 0;
+}
+
+.summary dt {
+  color: var(--color-text-secondary);
+}
+
+.summary dd {
+  margin: 0;
+  font-weight: 600;
+}

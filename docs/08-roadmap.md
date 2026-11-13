@@ -56,7 +56,7 @@
 - [x] 3.1 `packages/ui-tokens` + teste de contraste AA + CSS variables por paleta/modo
 - [x] 3.2 Rota `/[slug]` (RSC) com tema da profissional, metadata/OG
 - [x] 3.3 Etapa 1 — cards de serviço
-- [ ] 3.4 Etapa 2 — calendário (dias com vaga) + grade de slots; cria hold ao avançar
+- [x] 3.4 Etapa 2 — calendário (dias com vaga) + grade de slots; cria hold ao avançar
 - [ ] 3.5 Etapa 3 — formulário (nome, telefone com máscara BR → E.164, observações), contador do hold, política de cancelamento
 - [ ] 3.6 Tela de sucesso + botão `wa.me` + "adicionar ao calendário" (.ics)
 - [ ] 3.7 Tratamento de 409/410 com volta à etapa 2

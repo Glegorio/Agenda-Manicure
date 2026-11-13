@@ -43,7 +43,7 @@ export class BookingService {
     const startAt = new Date(startAtIso);
     const token = randomBytes(32).toString('base64url');
 
-    const expiresAt = await this.repository.withScheduleLock(professionalId, async (tx) => {
+    const created = await this.repository.withScheduleLock(professionalId, async (tx) => {
       const pro = await this.publicPage.professional(slug, tx);
       // Serviço lido sob o lock: um DELETE concorrente (2.5) não deixa o hold órfão.
       const service = await this.publicPage.visibleService(pro.id, serviceId, tx);
@@ -65,10 +65,20 @@ export class BookingService {
         tokenHash: hashHoldToken(token),
         expiresAt: new Date(query.now.getTime() + HOLD_TTL_MS),
       });
-      return hold.expiresAt;
+      return { hold, durationMin: service.durationMin };
     });
 
-    return { holdToken: token, expiresAt: expiresAt.toISOString() };
+    // Q-30/Q-40: a etapa 3 mostra o snapshot do hold, não o perfil em cache.
+    const { hold, durationMin } = created;
+    return {
+      holdToken: token,
+      expiresAt: hold.expiresAt.toISOString(),
+      startAt: hold.startAt.toISOString(),
+      endAt: hold.endAt.toISOString(),
+      serviceName: hold.serviceNameSnapshot,
+      priceCents: hold.priceCentsSnapshot,
+      durationMin,
+    };
   }
 
   /** A cliente voltou: libera o horário. Idempotente e silencioso (não revela se existia). */

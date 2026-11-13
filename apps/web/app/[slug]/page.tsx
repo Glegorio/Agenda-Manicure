@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { notFound } from 'next/navigation';
 import { buildThemeCss, getTheme, type ColorScheme } from '@agende/ui-tokens';
 import { getPublicProfile } from '../../lib/api/public-server';
+import { BookingFlowLoader } from './_components/BookingFlowLoader';
 import { ProfileHeader, formatLocation } from './_components/ProfileHeader';
 import { ServiceList } from './_components/ServiceList';
 import styles from './page.module.css';
@@ -11,6 +12,24 @@ const BODY_CSS = 'body { background: var(--color-background); color: var(--color
 
 interface Props {
   params: Promise<{ slug: string }>;
+}
+
+type SearchParams = Record<string, string | string[] | undefined>;
+
+const LOCAL_DATE = /^\d{4}-\d{2}-\d{2}$/;
+const UTC_INSTANT = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{3})?Z$/;
+
+/** Data de calendário real (`2026-02-31` e `2026-13-45` não passam). */
+const isRealDate = (value: string) =>
+  !Number.isNaN(Date.parse(`${value}T12:00:00Z`)) &&
+  new Date(`${value}T12:00:00Z`).toISOString().startsWith(value);
+
+/** Estado do fluxo na URL (`?service=&date=&slot=`); valores malformados são ignorados. */
+function param(searchParams: SearchParams, name: string, pattern?: RegExp): string | undefined {
+  const value = searchParams[name];
+  if (typeof value !== 'string') return undefined;
+  if (pattern && !pattern.test(value)) return undefined;
+  return pattern === LOCAL_DATE && !isRealDate(value) ? undefined : value;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -50,10 +69,17 @@ export async function generateViewport({ params }: Props): Promise<Viewport> {
   };
 }
 
-export default async function ProfilePage({ params }: Props) {
+export default async function ProfilePage({
+  params,
+  searchParams,
+}: Props & { searchParams: Promise<SearchParams> }) {
   const { slug } = await params;
   const profile = await getPublicProfile(slug);
   if (!profile) notFound();
+
+  const query = await searchParams;
+  // RN-91: só serviços que a API publicou; id desconhecido volta à etapa 1.
+  const service = profile.services.find((s) => s.id === param(query, 'service'));
 
   return (
     <>
@@ -61,7 +87,22 @@ export default async function ProfilePage({ params }: Props) {
 ${BODY_CSS}`}</style>
       <main className={styles.main}>
         <ProfileHeader {...profile} />
-        <ServiceList slug={profile.slug} services={profile.services} />
+        {service ? (
+          <BookingFlowLoader
+            slug={profile.slug}
+            timezone={profile.timezone}
+            service={{
+              id: service.id,
+              name: service.name,
+              durationMin: service.durationMin,
+              priceCents: service.priceCents,
+            }}
+            initialDate={param(query, 'date', LOCAL_DATE)}
+            initialSlot={param(query, 'slot', UTC_INSTANT)}
+          />
+        ) : (
+          <ServiceList slug={profile.slug} services={profile.services} />
+        )}
       </main>
     </>
   );

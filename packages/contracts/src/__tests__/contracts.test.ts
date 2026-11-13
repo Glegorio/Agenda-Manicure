@@ -272,13 +272,18 @@ describe('hold e reserva (RN-40..44)', () => {
     expect(ok(createHoldSchema, { serviceId: UUID, startAt: '2026-11-11' })).toBe(false);
   });
 
-  it('RN-40: resposta do hold tem token opaco e expiração', () => {
-    expect(
-      ok(holdResponseSchema, {
-        holdToken: 'b3BhcXVlLXRva2VuLWRlLTMyLWJ5dGVzLWFsZWF0b3Jpb3M',
-        expiresAt: '2026-11-11T11:05:00Z',
-      }),
-    ).toBe(true);
+  it('RN-40 / Q-40: resposta do hold tem token opaco, expiração e snapshot do serviço', () => {
+    const hold = {
+      holdToken: 'b3BhcXVlLXRva2VuLWRlLTMyLWJ5dGVzLWFsZWF0b3Jpb3M',
+      expiresAt: '2026-11-11T11:05:00Z',
+      startAt: '2026-11-11T13:00:00Z',
+      endAt: '2026-11-11T14:00:00Z',
+      serviceName: 'Esmaltação em Gel',
+      priceCents: 7000,
+      durationMin: 60,
+    };
+    expect(ok(holdResponseSchema, hold)).toBe(true);
+    expect(ok(holdResponseSchema, { ...hold, serviceName: undefined })).toBe(false);
   });
 
   it('RN-43 / RN-80: reserva exige token, nome e telefone E.164', () => {

@@ -8,10 +8,18 @@ const holdTokenSchema = z.string().regex(/^[A-Za-z0-9_-]{32,128}$/, 'Reserva inv
 /** `POST /v1/public/:slug/holds` (RN-40): o início vem como instante UTC devolvido pela grade. */
 export const createHoldSchema = z.object({ serviceId: idSchema, startAt: utcInstantSchema });
 
-/** Token opaco e expiração de 5 minutos (RN-40). */
+/**
+ * Token opaco e expiração de 5 minutos (RN-40), com o snapshot do serviço gravado no hold: a
+ * etapa 3 mostra o que a cliente vai pagar (Q-30, Q-40), não o perfil em cache.
+ */
 export const holdResponseSchema = z.object({
   holdToken: holdTokenSchema,
   expiresAt: utcInstantSchema,
+  startAt: utcInstantSchema,
+  endAt: utcInstantSchema,
+  serviceName: z.string(),
+  priceCents: centsSchema,
+  durationMin: z.int(),
 });
 
 /** `POST /v1/public/:slug/bookings` (RN-43, RN-81). */

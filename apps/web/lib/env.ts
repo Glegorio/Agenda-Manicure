@@ -6,6 +6,11 @@ export function serverApiBaseUrl(): string {
   return process.env.API_INTERNAL_BASE_URL || process.env.NEXT_PUBLIC_API_BASE_URL || DEFAULT_API;
 }
 
+/** URL da API no navegador. `NEXT_PUBLIC_*` é embutida no build: acesso literal obrigatório. */
+export function publicApiBaseUrl(): string {
+  return process.env.NEXT_PUBLIC_API_BASE_URL || DEFAULT_API;
+}
+
 /** URL pública da web: base de canonical e Open Graph. */
 export function siteUrl(): URL {
   return new URL(process.env.NEXT_PUBLIC_SITE_URL || DEFAULT_SITE);

@@ -11,9 +11,38 @@ const notFound = vi.fn(() => {
   throw new Error('NEXT_NOT_FOUND');
 });
 vi.mock('next/navigation', () => ({ notFound: () => notFound() }));
+vi.mock('../_components/BookingFlowLoader', () => ({
+  BookingFlowLoader: (props: {
+    service: { name: string };
+    initialDate?: string;
+    initialSlot?: string;
+  }) => (
+    <div data-testid="booking-flow">
+      {props.service.name}|{props.initialDate ?? '-'}|{props.initialSlot ?? '-'}
+    </div>
+  ),
+}));
 
 const { default: Page, generateMetadata, generateViewport } = await import('../page');
-const params = (slug: string) => ({ params: Promise.resolve({ slug }) });
+const params = (slug: string, searchParams: Record<string, string> = {}) => ({
+  params: Promise.resolve({ slug }),
+  searchParams: Promise.resolve(searchParams),
+});
+const SERVICE_ID = '01a1d4c4-ae02-742d-811c-1a062bb4fa3f';
+const withService = {
+  ...profileFixture,
+  services: [
+    {
+      id: SERVICE_ID,
+      name: 'Manicure',
+      category: 'Mãos',
+      description: null,
+      priceCents: 5000,
+      durationMin: 45,
+      imageUrl: null,
+    },
+  ],
+};
 
 beforeEach(() => {
   getPublicProfile.mockReset();
@@ -37,25 +66,51 @@ describe('/[slug]', () => {
   });
 
   it('etapa 1: lista os serviços do perfil', async () => {
-    getPublicProfile.mockResolvedValue({
-      ...profileFixture,
-      services: [
-        {
-          id: '01a1d4c4-ae02-742d-811c-1a062bb4fa3f',
-          name: 'Manicure',
-          category: 'Mãos',
-          description: null,
-          priceCents: 5000,
-          durationMin: 45,
-          imageUrl: null,
-        },
-      ],
-    });
+    getPublicProfile.mockResolvedValue(withService);
     render(await Page(params('studio-ana')));
     expect(
       screen.getByRole('heading', { level: 2, name: 'Escolha o serviço' }),
     ).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /Manicure/ })).toBeInTheDocument();
+  });
+
+  it('etapa 2: ?service= de um serviço público abre o fluxo com data e slot da URL', async () => {
+    getPublicProfile.mockResolvedValue(withService);
+    render(
+      await Page(
+        params('studio-ana', {
+          service: SERVICE_ID,
+          date: '2026-11-13',
+          slot: '2026-11-13T13:00:00.000Z',
+        }),
+      ),
+    );
+    expect(screen.getByTestId('booking-flow')).toHaveTextContent(
+      'Manicure|2026-11-13|2026-11-13T13:00:00.000Z',
+    );
+    expect(screen.queryByRole('heading', { name: 'Escolha o serviço' })).toBeNull();
+  });
+
+  it('RN-91: ?service= desconhecido volta à etapa 1', async () => {
+    getPublicProfile.mockResolvedValue(withService);
+    render(await Page(params('studio-ana', { service: 'outro' })));
+    expect(screen.queryByTestId('booking-flow')).toBeNull();
+    expect(screen.getByRole('heading', { name: 'Escolha o serviço' })).toBeInTheDocument();
+  });
+
+  it('data impossível na URL é ignorada (não derruba a página)', async () => {
+    getPublicProfile.mockResolvedValue(withService);
+    for (const date of ['2026-13-45', '2026-02-31', '2026-00-10']) {
+      const { unmount } = render(await Page(params('studio-ana', { service: SERVICE_ID, date })));
+      expect(screen.getByTestId('booking-flow')).toHaveTextContent('Manicure|-|-');
+      unmount();
+    }
+  });
+
+  it('date e slot malformados na URL são ignorados', async () => {
+    getPublicProfile.mockResolvedValue(withService);
+    render(await Page(params('studio-ana', { service: SERVICE_ID, date: '13/11', slot: 'x' })));
+    expect(screen.getByTestId('booking-flow')).toHaveTextContent('Manicure|-|-');
   });
 
   it('Q-27: sem opt-in mostra só cidade e UF', async () => {

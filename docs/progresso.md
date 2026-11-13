@@ -324,3 +324,23 @@
 - Pendências: `apps/web/AGENTS.md` gerado pelo `next dev` ficou fora do commit (versionar ou
   ignorar?); nome do card no leitor de tela começa pela categoria (avaliar na 3.9 com axe).
 - Próximo: 3.4 (calendário + grade + hold; CORS e snapshot do hold na API).
+
+## 2026-11-13 — 3.4 concluída
+
+- API: CORS por `CORS_ORIGINS` (Q-39, `common/cors.ts`, aviso no log se vazio, sem `Authorization`);
+  hold devolve `startAt/endAt/serviceName/priceCents/durationMin` do snapshot (Q-40). Doc 05 atualizado.
+- Web: `BookingFlow` (só no cliente via `BookingFlowLoader`, `ssr: false`): calendário do mês com dias
+  de `availability/days` a partir de "hoje" no fuso da profissional, grade de `availability`, hold ao
+  "Continuar" com o `startAt` exato (RN-40), token só na sessionStorage, hold anterior liberado antes
+  do novo, 409 avisa e recarrega (RN-41), resumo do hold (formulário na 3.5). Estado na URL pela
+  History API (sem ida ao servidor); Voltar sai da etapa 3 e libera o hold. Datas/horas por `Intl`
+  (`lib/datetime.ts`), cliente só com tipos de `@agende/contracts` (sem Zod no bundle). ESLint proíbe
+  `@agende/scheduling` na web (regra 2).
+- Revisões: 🔴 corrigidos — resumo não aparecia após o hold (estado só na montagem) e Voltar não
+  sincronizava; `?date=` impossível derrubava a página; regiões vivas sempre montadas, "Tentar de
+  novo" nas falhas e foco após 409/hold/troca de horário.
+- Pendências: `MAX_MONTHS_AHEAD = 2` fixo (o perfil público não expõe `booking_horizon_days`; horizonte
+  > ~60 dias fica inalcançável) — decisão de produto; token do hold no path do `DELETE` (mover para
+  > body/header ou cortar do log na 8.2); `releaseHold` ignora falha (3.7); margem de ~2 s no contador
+  > (3.5); "Trocar serviço" não libera hold ativo.
+- Próximo: 3.5 (formulário, máscara de telefone, contador do hold, política de cancelamento).
