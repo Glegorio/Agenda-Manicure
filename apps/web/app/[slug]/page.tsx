@@ -43,6 +43,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: `${profile.businessName} · Agende`,
     description,
     alternates: { canonical: `/${profile.slug}` },
+    // Q-36: app instalado da profissional.
+    manifest: `/${profile.slug}/manifest.webmanifest`,
+    icons: { apple: `/${profile.slug}/pwa-icon/180` },
+    appleWebApp: { capable: true, title: profile.businessName, statusBarStyle: 'default' },
     openGraph: {
       title: profile.businessName,
       description,

@@ -403,3 +403,22 @@
   tira o hold da sessão antes (pedido do mesmo horário pode dar 409 até expirar); `?date=` além do
   horizonte mostra grade vazia; token no path do `DELETE` → redigir nos logs (8.2).
 - Próximo: 3.8 (PWA: manifest por profissional — Q-36 —, ícones, service worker sem cachear slots).
+
+## 2026-11-13 — 3.8 concluída
+
+- Q-36: `/[slug]/manifest.webmanifest` (nome, `start_url`/`scope` no slug, cores da paleta no modo da
+  profissional — SYSTEM usa o claro) e `/[slug]/pwa-icon/[180|192|512]` (inicial do negócio sobre a
+  primary, cabe na zona do maskable; logo depende da Q-09). Metadata com manifest e apple-touch-icon.
+- `public/sw.js` à mão, só com lista de permitidos: `/_next/static/` cache-first com limite de 60
+  entradas; navegações rede primeiro com `public/offline.html` (estático, sem CSS/JS externos, com
+  "Tentar de novo"); nunca intercepta outra origem nem segmentos availability/holds/bookings; ícones
+  ficam no cache HTTP. Registro só em produção; `/sw.js` com `no-cache`. Testado executando o
+  próprio arquivo num `vm` (`test/sw.test.ts`).
+- Revisões: sem 🔴. Corrigidos 🟡: página offline dependia de CSS/JS com hash (não abria sem rede),
+  cache crescia a cada deploy, ícone eterno no SW, testes de "nunca cachear" que passariam sem a
+  regra, emoji como inicial, tema diferente entre ícone e manifest, regex que pegava slugs como
+  `bookings-nails`.
+- Pendências: versão do cache (`VERSION`) é manual; sem `navigationPreload` (medir na 3.10); slug
+  inexistente em manifest/ícone chama a API a cada pedido (404 não entra no cache do Next) — rate
+  limit do lado web na 8.4.
+- Próximo: 3.9 (Playwright: fluxo feliz, slot tomado, hold expirado; axe; job na CI — Q-38).

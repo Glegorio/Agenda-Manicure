@@ -18,6 +18,15 @@ const nextConfig: NextConfig = {
     },
   },
   poweredByHeader: false,
+  // O navegador sempre confere se há versão nova do service worker (3.8).
+  headers() {
+    return Promise.resolve([
+      {
+        source: '/sw.js',
+        headers: [{ key: 'Cache-Control', value: 'no-cache, no-store, must-revalidate' }],
+      },
+    ]);
+  },
 };
 
 export default nextConfig;

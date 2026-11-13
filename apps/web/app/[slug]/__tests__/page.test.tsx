@@ -140,6 +140,14 @@ describe('/[slug]', () => {
     expect(metadata.openGraph?.title).toBe('Studio Ana Nails');
   });
 
+  it('Q-36: metadata aponta o manifest e o ícone da profissional', async () => {
+    getPublicProfile.mockResolvedValue(profileFixture);
+    const metadata = await generateMetadata(params('studio-ana'));
+    expect(metadata.manifest).toBe('/studio-ana/manifest.webmanifest');
+    expect(metadata.icons).toMatchObject({ apple: '/studio-ana/pwa-icon/180' });
+    expect(metadata.appleWebApp).toMatchObject({ capable: true, title: 'Studio Ana Nails' });
+  });
+
   it('metadata de perfil inexistente não lança', async () => {
     getPublicProfile.mockResolvedValue(null);
     await expect(generateMetadata(params('x'))).resolves.toMatchObject({

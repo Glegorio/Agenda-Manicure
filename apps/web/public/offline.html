@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="robots" content="noindex" />
+    <title>Sem conexão · Agende</title>
+    <!--
+      Página do service worker (3.8): tudo embutido, para abrir mesmo sem rede. As cores são cópias
+      dos neutros de @agende/ui-tokens (NEUTRALS) e da paleta Elegance Black — não há CSS variables
+      aqui. Atualize junto se os tokens mudarem.
+    -->
+    <style>
+      :root {
+        color-scheme: light dark;
+      }
+      body {
+        margin: 0;
+        font-family:
+          system-ui,
+          -apple-system,
+          'Segoe UI',
+          Roboto,
+          sans-serif;
+        line-height: 1.5;
+        background: #faf8f7;
+        color: #1f1a1c;
+      }
+      main {
+        max-width: 40rem;
+        margin: 0 auto;
+        padding: max(1.5rem, env(safe-area-inset-top)) max(1.5rem, env(safe-area-inset-right))
+          max(1.5rem, env(safe-area-inset-bottom)) max(1.5rem, env(safe-area-inset-left));
+      }
+      p {
+        color: #5c5458;
+      }
+      a {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 48px;
+        border-radius: 12px;
+        background: #1f1f1f;
+        color: #ffffff;
+        font-weight: 600;
+        text-decoration: none;
+      }
+      a:focus-visible {
+        outline: 2px solid #1f1f1f;
+        outline-offset: 2px;
+      }
+      @media (prefers-color-scheme: dark) {
+        body {
+          background: #141213;
+          color: #f3eff0;
+        }
+        p {
+          color: #c4bbbf;
+        }
+        a {
+          background: #f2f2f2;
+          color: #1f1f1f;
+        }
+        a:focus-visible {
+          outline-color: #f2f2f2;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Você está sem internet</h1>
+      <p>
+        Os horários só aparecem com conexão, para você não escolher um que já foi tomado. Confira
+        sua internet e tente de novo.
+      </p>
+      <!-- href vazio recarrega a página atual, sem JavaScript. -->
+      <a href="">Tentar de novo</a>
+    </main>
+  </body>
+</html>
