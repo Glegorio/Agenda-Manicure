@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@agende/contracts": "workspace:*",
+    "@agende/money": "workspace:*",
     "@agende/ui-tokens": "workspace:*",
     "next": "^16.4.6",
     "react": "19.3.0",

@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { buildThemeCss, getTheme, type ColorScheme } from '@agende/ui-tokens';
 import { getPublicProfile } from '../../lib/api/public-server';
 import { ProfileHeader, formatLocation } from './_components/ProfileHeader';
+import { ServiceList } from './_components/ServiceList';
 import styles from './page.module.css';
 
 /** O tema cobre a página inteira, não só a coluna do `main`. */
@@ -60,7 +61,7 @@ export default async function ProfilePage({ params }: Props) {
 ${BODY_CSS}`}</style>
       <main className={styles.main}>
         <ProfileHeader {...profile} />
-        {/* Etapas do agendamento entram a partir da 3.3. */}
+        <ServiceList slug={profile.slug} services={profile.services} />
       </main>
     </>
   );

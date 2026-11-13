@@ -36,6 +36,28 @@ describe('/[slug]', () => {
     expect(css).toContain('prefers-color-scheme: dark');
   });
 
+  it('etapa 1: lista os serviços do perfil', async () => {
+    getPublicProfile.mockResolvedValue({
+      ...profileFixture,
+      services: [
+        {
+          id: '01a1d4c4-ae02-742d-811c-1a062bb4fa3f',
+          name: 'Manicure',
+          category: 'Mãos',
+          description: null,
+          priceCents: 5000,
+          durationMin: 45,
+          imageUrl: null,
+        },
+      ],
+    });
+    render(await Page(params('studio-ana')));
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'Escolha o serviço' }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Manicure/ })).toBeInTheDocument();
+  });
+
   it('Q-27: sem opt-in mostra só cidade e UF', async () => {
     getPublicProfile.mockResolvedValue(profileFixture);
     render(await Page(params('studio-ana')));

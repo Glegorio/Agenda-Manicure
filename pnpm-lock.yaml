@@ -330,6 +330,9 @@ importers:
       '@agende/contracts':
         specifier: workspace:*
         version: link:../../packages/contracts
+      '@agende/money':
+        specifier: workspace:*
+        version: link:../../packages/money
       '@agende/ui-tokens':
         specifier: workspace:*
         version: link:../../packages/ui-tokens

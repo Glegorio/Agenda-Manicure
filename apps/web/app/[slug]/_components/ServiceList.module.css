@@ -1,0 +1,98 @@
+.section {
+  padding: 0 var(--space-4) var(--space-6);
+}
+
+.title {
+  margin: 0 0 var(--space-3);
+  font-size: var(--font-size-lg);
+  color: var(--color-text-primary);
+}
+
+.empty {
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+.list {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.card {
+  position: relative;
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  min-height: var(--touch-target);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  text-decoration: none;
+  transition: border-color var(--motion-fast) var(--motion-easing);
+}
+
+.card:hover {
+  border-color: var(--color-primary);
+}
+
+.card:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.image {
+  flex: none;
+  width: 72px;
+  height: 72px;
+  border-radius: var(--radius-md);
+  object-fit: cover;
+}
+
+.body {
+  display: grid;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.category {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.name {
+  margin: 0;
+  overflow-wrap: anywhere;
+  font-size: var(--font-size-md);
+  line-height: 1.3;
+}
+
+.description {
+  overflow-wrap: anywhere;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.meta {
+  font-size: var(--font-size-md);
+  color: var(--color-text-secondary);
+}
+
+.price {
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+/* Pausa entre duração e preço para leitores de tela. */
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

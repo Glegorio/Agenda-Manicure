@@ -311,3 +311,16 @@
   (preferir rem); `focusRing = primary` some sobre botão primário; URLs com fallback localhost em
   produção; sem testes de `opengraph-image` e `lib/env.ts`. 404 de slug novo fica em cache até 60 s.
 - Próximo: 3.3 (cards de serviço).
+
+## 2026-11-13 — 3.1 (ajustes) e 3.3 concluídas
+
+- Ajustes da revisão da 3.1 (`fix/3.1-tokens-a11y`): contraste testado para toda cor usada como
+  texto nos três fundos; `--touch-target`, anel de foco com offset, fontes em `rem`,
+  `prefers-reduced-motion` zera `--motion-*`. Q-40 (hold devolve o snapshot) aprovada.
+- 3.3: `ServiceList` (RSC, sem JS de cliente) com cards-link para `?service=<id>`, preço por
+  `formatBRL` (RN-77), duração por `formatDuration`, imagem decorativa só com `imageUrl` (`<img>`
+  até Q-09), estado vazio, `prefetch={false}`. A página ainda não lê `?service=`: o clique só muda a
+  URL até a 3.4.
+- Pendências: `apps/web/AGENTS.md` gerado pelo `next dev` ficou fora do commit (versionar ou
+  ignorar?); nome do card no leitor de tela começa pela categoria (avaliar na 3.9 com axe).
+- Próximo: 3.4 (calendário + grade + hold; CORS e snapshot do hold na API).
