@@ -12,6 +12,8 @@ import { PublicService } from './public.service.js';
 const MINUTE_MS = 60_000;
 /** RN-40: o hold vale 5 minutos. */
 const HOLD_TTL_MS = 5 * MINUTE_MS;
+/** Q-41: reenvio do hold confirmado devolve a mesma reserva por até 10 min. */
+const BOOKING_REPLAY_WINDOW_MS = 10 * MINUTE_MS;
 
 const slotUnavailable = () => new DomainError('SLOT_UNAVAILABLE');
 const holdExpired = () => new DomainError('HOLD_EXPIRED');
@@ -98,11 +100,30 @@ export class BookingService {
     const pro = await this.publicPage.professional(slug);
     const tokenHash = hashHoldToken(input.holdToken);
 
-    let booking: BookingResponse;
+    let result: { booking: BookingResponse; created: boolean };
     try {
-      booking = await this.repository.withScheduleLock(pro.id, async (tx) => {
+      result = await this.repository.withScheduleLock(pro.id, async (tx) => {
+        const now = this.clock.now();
         const hold = await this.repository.findHold(tx, pro.id, tokenHash);
-        if (!hold || hold.expiresAt <= this.clock.now()) throw holdExpired();
+        if (!hold || hold.expiresAt <= now) {
+          // Q-41: resposta perdida na rede e a cliente reenviou — devolve a reserva, sem alterá-la.
+          const since = new Date(now.getTime() - BOOKING_REPLAY_WINDOW_MS);
+          const done = await this.repository.findConfirmedByHold(tx, pro.id, tokenHash, since);
+          if (!done) throw holdExpired();
+          return {
+            created: false,
+            booking: {
+              appointmentId: done.id,
+              startAt: done.startAt.toISOString(),
+              endAt: done.endAt.toISOString(),
+              serviceName: done.serviceNameSnapshot,
+              priceCents: done.priceCentsSnapshot,
+              durationMin: done.durationMinSnapshot,
+              timezone: pro.timezone,
+              businessName: pro.businessName,
+            },
+          };
+        }
 
         const client = await this.repository.upsertClient(tx, pro.id, input.name, input.phone);
         const durationMin = Math.round((hold.endAt.getTime() - hold.startAt.getTime()) / MINUTE_MS);
@@ -118,18 +139,23 @@ export class BookingService {
           blockEndAt: hold.blockEndAt,
           clientNotes: input.notes ?? null,
           bookedName: input.name, // Q-29
+          holdTokenHash: tokenHash, // Q-41
+          createdAt: now,
         });
         await this.repository.deleteHold(tx, pro.id, tokenHash);
 
         return {
-          appointmentId: appointment.id,
-          startAt: hold.startAt.toISOString(),
-          endAt: hold.endAt.toISOString(),
-          serviceName: hold.serviceNameSnapshot,
-          priceCents: hold.priceCentsSnapshot,
-          durationMin,
-          timezone: pro.timezone,
-          businessName: pro.businessName,
+          created: true,
+          booking: {
+            appointmentId: appointment.id,
+            startAt: hold.startAt.toISOString(),
+            endAt: hold.endAt.toISOString(),
+            serviceName: hold.serviceNameSnapshot,
+            priceCents: hold.priceCentsSnapshot,
+            durationMin,
+            timezone: pro.timezone,
+            businessName: pro.businessName,
+          },
         };
       });
     } catch (error) {
@@ -137,8 +163,9 @@ export class BookingService {
       if (postgresErrorCode(error) === PG_EXCLUSION_VIOLATION) throw slotUnavailable();
       throw error;
     }
-    // Depois do commit: a Agenda Hub recebe a reserva nova (SSE, ADR-0001).
-    await this.appointments.publishCreated(pro.id, booking.appointmentId);
-    return booking;
+    // Depois do commit: a Agenda Hub recebe a reserva nova (SSE, ADR-0001); reenvio não publica.
+    if (result.created)
+      await this.appointments.publishCreated(pro.id, result.booking.appointmentId);
+    return result.booking;
   }
 }

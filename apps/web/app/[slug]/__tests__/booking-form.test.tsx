@@ -409,3 +409,29 @@ describe('BookingFlow — etapa 3, casos de borda', () => {
     expect(screen.getByRole('timer')).toHaveTextContent('4:58');
   });
 });
+
+describe('BookingFlow — 3.7 (reenvio)', () => {
+  it('Q-41: depois de um erro de rede, reenviar confirma (a API devolve a mesma reserva)', async () => {
+    const user = userEvent.setup();
+    const createBooking = vi
+      .fn()
+      .mockRejectedValueOnce(new TypeError('Failed to fetch'))
+      .mockResolvedValue(booking);
+    renderStep3(fakeApi({ createBooking }));
+
+    await fillValid(user);
+    await user.click(confirm());
+    await waitFor(() => {
+      expect(
+        screen.getAllByRole('alert').some((a) => /Verifique a conexão/.test(a.textContent)),
+      ).toBe(true);
+    });
+    await user.click(confirm());
+
+    expect(
+      await screen.findByRole('heading', { name: /Agendamento confirmado/ }),
+    ).toBeInTheDocument();
+    expect(createBooking).toHaveBeenCalledTimes(2);
+    expect(createBooking.mock.calls[1]?.[1]).toEqual(createBooking.mock.calls[0]?.[1]);
+  });
+});

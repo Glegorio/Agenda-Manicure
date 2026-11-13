@@ -381,3 +381,25 @@
   pela Meta na query string ao clicar; citar na política. `.ics` só em pt-BR.
 - Próximo: 3.7 (409/410 com volta à etapa 2 — boa parte já feita na 3.4/3.5; faltam idempotência
   da confirmação, "Trocar serviço" liberando o hold e falha do `releaseHold`).
+
+## 2026-11-13 — 3.7 concluída
+
+- Decisões da usuária: **Q-41** (reenvio idempotente da confirmação, RN-43 atualizada) e **Q-42**
+  (horizonte no perfil público).
+- API: `appointments.hold_token_hash` (sha256, índice único por profissional; migration
+  `20261113180000_booking_replay` — **rode `pnpm --filter api prisma migrate deploy` no banco de
+  desenvolvimento**). Hold ausente/expirado → procura sob o lock a reserva ativa (SCHEDULED/
+  IN_PROGRESS) criada com o mesmo token nos últimos 10 min e a devolve sem alterar nem republicar
+  SSE; senão 410. `createdAt` da reserva web vem do `Clock`. Premissa READ COMMITTED documentada em
+  `runInScheduleTransaction`. Perfil público devolve `bookingHorizonDays` (docs 04 e 05 atualizados).
+- Web: calendário limitado pelo horizonte; 429 mostra os segundos de espera (`Retry-After`); mesmo
+  horário com hold válido na sessão é reaproveitado; "Trocar serviço" libera o hold. 409/410 com
+  volta à etapa 2 já vinham da 3.4/3.5.
+- Testes alterados de propósito pela Q-41: "hold já usado → 410" virou "reenvio devolve a mesma
+  reserva"; confirmações simultâneas agora dão 201 + 201 com o mesmo id. Dois testes de troca de
+  horário da web passaram a escolher outro horário (o mesmo agora é reaproveitado).
+- Revisões: sem 🔴. Pendências: hash do token fica para sempre (zerar no job da RN-46 após 10 min,
+  minimização); P2002 no índice novo viraria 500 (só com colisão de 256 bits); `releaseHold` que falha
+  tira o hold da sessão antes (pedido do mesmo horário pode dar 409 até expirar); `?date=` além do
+  horizonte mostra grade vazia; token no path do `DELETE` → redigir nos logs (8.2).
+- Próximo: 3.8 (PWA: manifest por profissional — Q-36 —, ícones, service worker sem cachear slots).

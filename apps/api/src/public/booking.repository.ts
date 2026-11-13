@@ -34,6 +34,27 @@ export class BookingRepository {
     return tx.slotHold.findFirst({ where: { tokenHash, professionalId } });
   }
 
+  /** Q-41: reserva já confirmada com este token, criada a partir de `since`. */
+  findConfirmedByHold(tx: Db, professionalId: string, tokenHash: string, since: Date) {
+    return tx.appointment.findFirst({
+      // Cancelada nesse meio-tempo não volta como confirmada (cai no 410).
+      where: {
+        professionalId,
+        holdTokenHash: tokenHash,
+        createdAt: { gte: since },
+        status: { in: ['SCHEDULED', 'IN_PROGRESS'] },
+      },
+      select: {
+        id: true,
+        startAt: true,
+        endAt: true,
+        serviceNameSnapshot: true,
+        priceCentsSnapshot: true,
+        durationMinSnapshot: true,
+      },
+    });
+  }
+
   async deleteHold(tx: Db, professionalId: string, tokenHash: string): Promise<void> {
     await tx.slotHold.deleteMany({ where: { tokenHash, professionalId } });
   }
@@ -65,6 +86,8 @@ export class BookingRepository {
       blockEndAt: Date;
       clientNotes: string | null;
       bookedName: string;
+      holdTokenHash: string;
+      createdAt: Date;
     },
   ) {
     return tx.appointment.create({ data: { ...data, source: 'WEB' }, select: { id: true } });

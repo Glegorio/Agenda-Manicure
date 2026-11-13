@@ -13,6 +13,7 @@ const profile = {
   themePalette: 'ROSE_GOLD',
   themeMode: 'SYSTEM',
   cancellationPolicy: 'Avise com 24 horas.',
+  bookingHorizonDays: 30,
   services: [
     {
       id: '3f1c9b4e-8a2d-4c6e-9f1a-2b3c4d5e6f70',

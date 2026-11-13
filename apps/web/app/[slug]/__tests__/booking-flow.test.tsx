@@ -149,7 +149,7 @@ describe('BookingFlow — etapa 2', () => {
     });
     renderFlow(api, { initialDate: '2026-11-13' });
 
-    await user.click(await screen.findByRole('button', { name: /10:15$/ }));
+    await user.click(await screen.findByRole('button', { name: /10:00$/ }));
     await user.click(screen.getByRole('button', { name: 'Continuar' }));
 
     await waitFor(() => {
@@ -271,7 +271,7 @@ describe('BookingFlow — robustez e acessibilidade', () => {
     });
     renderFlow(api, { initialDate: '2026-11-13' });
 
-    await user.click(await screen.findByRole('button', { name: /10:15$/ }));
+    await user.click(await screen.findByRole('button', { name: /10:00$/ }));
     await user.click(screen.getByRole('button', { name: 'Continuar' }));
 
     await waitFor(() => {
@@ -380,5 +380,74 @@ describe('BookingFlow — robustez e acessibilidade', () => {
     expect(
       await screen.findByRole('button', { name: 'sábado, 14 de novembro, sem horários' }),
     ).toBeDisabled();
+  });
+});
+
+describe('BookingFlow — 3.7 (horizonte, reuso do hold, 429)', () => {
+  it('Q-42: o calendário avança até o mês do fim do horizonte e para', async () => {
+    const user = userEvent.setup();
+    // 12/11/2026 + 90 dias = 10/02/2027.
+    renderFlow(fakeApi(), { bookingHorizonDays: 90 });
+    const next = await screen.findByRole('button', { name: 'Próximo mês' });
+
+    await user.click(next);
+    await user.click(next);
+    await user.click(next);
+
+    expect(screen.getByText('fevereiro de 2027')).toBeInTheDocument();
+    expect(next).toBeDisabled();
+  });
+
+  it('Q-42: horizonte curto não deixa sair do mês atual', async () => {
+    renderFlow(fakeApi(), { bookingHorizonDays: 7 });
+    expect(await screen.findByRole('button', { name: 'Próximo mês' })).toBeDisabled();
+  });
+
+  it('mesmo horário do hold ainda válido: reaproveita, sem liberar nem criar outro', async () => {
+    const user = userEvent.setup();
+    const api = fakeApi();
+    saveHold('studio-ana', { ...holdResponse, serviceId: service.id, serverOffsetMs: 0 });
+    renderFlow(api, { initialDate: '2026-11-13' });
+
+    await user.click(await screen.findByRole('button', { name: /10:15$/ }));
+    await user.click(screen.getByRole('button', { name: 'Continuar' }));
+
+    expect(
+      await screen.findByRole('heading', { name: 'Horário reservado por 5 minutos' }),
+    ).toBeInTheDocument();
+    expect(api.createHold).not.toHaveBeenCalled();
+    expect(api.releaseHold).not.toHaveBeenCalled();
+  });
+
+  it('429: avisa quantos segundos esperar e não avança', async () => {
+    const user = userEvent.setup();
+    const api = fakeApi({
+      createHold: vi
+        .fn()
+        .mockRejectedValue(new ApiError(429, 'RATE_LIMITED', 'Muitas tentativas.', 30)),
+    });
+    renderFlow(api, { initialDate: '2026-11-13' });
+
+    await user.click(await screen.findByRole('button', { name: /10:15$/ }));
+    await user.click(screen.getByRole('button', { name: 'Continuar' }));
+
+    await waitFor(() => {
+      expect(screen.getByRole('alert')).toHaveTextContent(
+        'Muitas tentativas. Tente de novo em 30 segundos.',
+      );
+    });
+    expect(push).not.toHaveBeenCalled();
+  });
+
+  it('"Trocar serviço" libera um hold guardado na sessão', async () => {
+    const user = userEvent.setup();
+    const api = fakeApi();
+    saveHold('studio-ana', { ...holdResponse, serviceId: service.id, serverOffsetMs: 0 });
+    renderFlow(api, { initialDate: '2026-11-13' });
+
+    await user.click(await screen.findByRole('link', { name: 'Trocar serviço' }));
+
+    expect(api.releaseHold).toHaveBeenCalledWith('studio-ana', TOKEN);
+    expect(loadHold('studio-ana')).toBeNull();
   });
 });

@@ -88,27 +88,28 @@ CHECK E.164 (RN-80); unique `(id, professional_id)` para FK composta.
 
 ### appointments
 
-| coluna                | tipo             | notas                                   |
-| --------------------- | ---------------- | --------------------------------------- |
-| id                    | uuid             |                                         |
-| professional_id       | uuid             |                                         |
-| client_id             | uuid             |                                         |
-| service_id            | uuid null        |                                         |
-| service_name_snapshot | text             | RN-11                                   |
-| price_cents_snapshot  | int              |                                         |
-| duration_min_snapshot | smallint         |                                         |
-| start_at              | timestamptz      |                                         |
-| end_at                | timestamptz      | `start_at + duration`                   |
-| block_end_at          | timestamptz      | `end_at + buffer` vigente no momento    |
-| status                | enum             | RN-50                                   |
-| source                | enum `WEB`,`APP` |                                         |
-| client_notes          | text             | observações da etapa 3                  |
-| paid_cents            | int null         | RN-52                                   |
-| payment_method        | enum null        | `PIX`,`CREDIT_CARD`,`DEBIT_CARD`,`CASH` |
-| cancelled_by          | enum null        |                                         |
-| cancel_reason         | text null        | motivo do cancelamento ou da falta      |
-| status_changed_at     | timestamptz      |                                         |
-| booked_name           | text null        | Q-29: nome digitado na reserva pública  |
+| coluna                | tipo             | notas                                                                                |
+| --------------------- | ---------------- | ------------------------------------------------------------------------------------ |
+| id                    | uuid             |                                                                                      |
+| professional_id       | uuid             |                                                                                      |
+| client_id             | uuid             |                                                                                      |
+| service_id            | uuid null        |                                                                                      |
+| service_name_snapshot | text             | RN-11                                                                                |
+| price_cents_snapshot  | int              |                                                                                      |
+| duration_min_snapshot | smallint         |                                                                                      |
+| start_at              | timestamptz      |                                                                                      |
+| end_at                | timestamptz      | `start_at + duration`                                                                |
+| block_end_at          | timestamptz      | `end_at + buffer` vigente no momento                                                 |
+| status                | enum             | RN-50                                                                                |
+| source                | enum `WEB`,`APP` |                                                                                      |
+| client_notes          | text             | observações da etapa 3                                                               |
+| paid_cents            | int null         | RN-52                                                                                |
+| payment_method        | enum null        | `PIX`,`CREDIT_CARD`,`DEBIT_CARD`,`CASH`                                              |
+| cancelled_by          | enum null        |                                                                                      |
+| cancel_reason         | text null        | motivo do cancelamento ou da falta                                                   |
+| status_changed_at     | timestamptz      |                                                                                      |
+| booked_name           | text null        | Q-29: nome digitado na reserva pública                                               |
+| hold_token_hash       | text null        | Q-41: sha256 do token do hold confirmado; único por profissional (reenvio em 10 min) |
 
 **Constraint anti double-booking (SQL cru na migration — Prisma não gera):**
 

@@ -242,6 +242,8 @@ model Appointment {
   clientNotes         String?           @map("client_notes")
   /// Q-29: nome digitado na reserva pública (o cadastro de cliente existente não muda)
   bookedName          String?           @map("booked_name")
+  /// Q-41: sha256 do token do hold confirmado; reenvio na janela devolve esta reserva
+  holdTokenHash       String?           @map("hold_token_hash")
   paidCents           Int?              @map("paid_cents")
   paymentMethod       PaymentMethod?    @map("payment_method")
   cancelledBy         CancelledBy?      @map("cancelled_by")
@@ -259,6 +261,7 @@ model Appointment {
   @@index([professionalId, status, startAt])
   @@index([clientId, professionalId])
   @@index([serviceId])
+  @@unique([professionalId, holdTokenHash])
   @@map("appointments")
 }
 

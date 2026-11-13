@@ -5,6 +5,7 @@ import type { BookingResponse } from '@agende/contracts';
 import { formatBRL } from '@agende/money';
 import { ApiError, createPublicClient, type PublicClient } from '../../../lib/api/public-client';
 import {
+  addDays,
   addMonths,
   browserTimeZone as detectBrowserTimeZone,
   formatDateLabel,
@@ -47,18 +48,23 @@ interface Props {
   cancellationPolicy?: string | null | undefined;
   /** Q-27: local publicado (endereço completo ou cidade/UF), para a confirmação. */
   location?: string | null | undefined;
+  /** RN-25 / Q-42: até quantos dias à frente há agenda (limita a navegação do calendário). */
+  bookingHorizonDays?: number | undefined;
 }
 
 /** Resultado de uma consulta, indexado por ela: consulta nova = carregando, sem setState no effect. */
 type Result<T> = { key: string; data: T } | { key: string; error: string };
 
-/** Quantos meses à frente o calendário navega (a API corta pelo horizonte, RN-33). */
-const MAX_MONTHS_AHEAD = 2;
 const WEEKDAYS = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
 const NETWORK_ERROR = 'Não foi possível falar com a agenda. Verifique a conexão e tente de novo.';
 
-const errorMessage = (error: unknown) =>
-  error instanceof ApiError ? error.message : NETWORK_ERROR;
+function errorMessage(error: unknown): string {
+  if (!(error instanceof ApiError)) return NETWORK_ERROR;
+  if (error.code === 'RATE_LIMITED' && error.retryAfterS) {
+    return `${error.message} Tente de novo em ${String(error.retryAfterS)} segundos.`;
+  }
+  return error.message;
+}
 
 function isValidHold(hold: StoredHold | null, startAt: string | undefined, serviceId: string) {
   return (
@@ -80,6 +86,7 @@ export function BookingFlow({
   browserTimeZone,
   cancellationPolicy = null,
   location = null,
+  bookingHorizonDays = 30,
 }: Props) {
   const api = useMemo(() => injectedApi ?? createPublicClient(publicApiBaseUrl()), [injectedApi]);
 
@@ -215,6 +222,15 @@ export function BookingFlow({
     setSubmitting(true);
     setActionError(null);
     const previous = loadHold(slug);
+    // Mesmo horário com o hold desta sessão ainda válido (ex.: recarregou a página na etapa 2):
+    // reaproveita, em vez de liberar e pedir de novo. Se uma liberação anterior falhou, o hold já
+    // saiu da sessão e o novo pedido pode dar 409 até ele expirar (RN-46).
+    if (previous && isValidHold(previous, selected, service.id)) {
+      setSubmitting(false);
+      setHeld(previous);
+      window.history.pushState(null, '', urlFor({ date, slot: previous.startAt }));
+      return;
+    }
     if (previous) {
       clearHold(slug);
       await api.releaseHold(slug, previous.holdToken).catch(() => undefined);
@@ -323,7 +339,18 @@ export function BookingFlow({
       <p className={styles.service}>
         {service.name} · {formatDuration(service.durationMin)} · {formatBRL(service.priceCents)}
       </p>
-      <a className={styles.link} href={`/${slug}`}>
+      <a
+        className={styles.link}
+        href={`/${slug}`}
+        onClick={() => {
+          // Sair do fluxo não pode deixar um hold preso até expirar.
+          const stored = loadHold(slug);
+          if (stored) {
+            clearHold(slug);
+            void api.releaseHold(slug, stored.holdToken).catch(() => undefined);
+          }
+        }}
+      >
         Trocar serviço
       </a>
 
@@ -372,7 +399,7 @@ export function BookingFlow({
             onClick={() => {
               setMonth(addMonths(month, 1));
             }}
-            disabled={month >= addMonths(thisMonth, MAX_MONTHS_AHEAD)}
+            disabled={month >= addDays(today, bookingHorizonDays).slice(0, 7)}
             aria-label="Próximo mês"
           >
             <span aria-hidden="true">›</span>

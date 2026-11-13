@@ -35,6 +35,10 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
 /**
  * Abre uma transação, pega o lock da agenda e roda `fn`. Fila longa demais (timeout do Prisma ou
  * `lock_timeout`) vira `503 SERVICE_UNAVAILABLE` — não 409: não se sabe se o horário foi tomado.
+ *
+ * Premissa: isolamento READ COMMITTED (padrão). Cada instrução depois do lock enxerga o que a
+ * transação anterior gravou — a 2ª confirmação do mesmo hold vê a reserva e a devolve (Q-41). Em
+ * REPEATABLE READ a foto seria tirada antes da espera pelo lock.
  */
 export async function runInScheduleTransaction<T>(
   prisma: PrismaService,

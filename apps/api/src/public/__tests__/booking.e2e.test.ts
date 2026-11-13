@@ -359,12 +359,68 @@ describe('POST /v1/public/:slug/bookings', () => {
     expect(await prisma.appointment.count()).toBe(0);
   });
 
-  it('RN-44: hold inexistente ou já usado → 410', async () => {
+  it('RN-44: hold inexistente → 410', async () => {
+    await setupStudio();
+    expect((await postBooking('studio-ana', 'a'.repeat(43))).status).toBe(410);
+  });
+
+  it('Q-41: reenviar o hold já confirmado devolve a mesma reserva, sem criar outra', async () => {
+    const { service } = await setupStudio();
+    const { holdToken } = await hold('studio-ana', service.id);
+    const first = bookingResponseSchema.parse(
+      (await postBooking('studio-ana', holdToken).expect(201)).body,
+    );
+
+    clock.advance({ minutes: 9 });
+    const again = await postBooking('studio-ana', holdToken, { name: 'Outra Pessoa' }).expect(201);
+
+    expect(bookingResponseSchema.parse(again.body)).toEqual(first);
+    expect(await prisma.appointment.count()).toBe(1);
+    // O reenvio não altera a reserva (nome digitado continua o da confirmação).
+    const stored = await prisma.appointment.findFirstOrThrow();
+    expect(stored.bookedName).toBe('Maria Souza');
+  });
+
+  it('Q-41: reserva cancelada pela profissional não volta como confirmada no reenvio', async () => {
     const { service } = await setupStudio();
     const { holdToken } = await hold('studio-ana', service.id);
     await postBooking('studio-ana', holdToken).expect(201);
+    await prisma.appointment.updateMany({
+      data: { status: 'CANCELLED', cancelledBy: 'PROFESSIONAL' },
+    });
+
     expect((await postBooking('studio-ana', holdToken)).status).toBe(410);
-    expect((await postBooking('studio-ana', 'a'.repeat(43))).status).toBe(410);
+  });
+
+  it('Q-41: reenvio depois de 10 min → 410', async () => {
+    const { service } = await setupStudio();
+    const { holdToken } = await hold('studio-ana', service.id);
+    await postBooking('studio-ana', holdToken).expect(201);
+
+    clock.advance({ minutes: 10, seconds: 1 });
+
+    expect(errorCode((await postBooking('studio-ana', holdToken).expect(410)).body)).toBe(
+      'HOLD_EXPIRED',
+    );
+  });
+
+  it('Q-41 / regra 5: token confirmado em outra profissional não devolve a reserva', async () => {
+    const { service } = await setupStudio();
+    await setupStudio('bia-nails');
+    const { holdToken } = await hold('studio-ana', service.id);
+    await postBooking('studio-ana', holdToken).expect(201);
+
+    expect((await postBooking('bia-nails', holdToken)).status).toBe(410);
+  });
+
+  it('Q-41: o hash do token fica na reserva, nunca o token', async () => {
+    const { service } = await setupStudio();
+    const { holdToken } = await hold('studio-ana', service.id);
+    await postBooking('studio-ana', holdToken).expect(201);
+
+    const stored = await prisma.appointment.findFirstOrThrow();
+    expect(stored.holdTokenHash).toMatch(/^[0-9a-f]{64}$/);
+    expect(stored.holdTokenHash).not.toBe(holdToken);
   });
 
   it('regra 5: hold de outra profissional não confirma por outro slug', async () => {
@@ -412,15 +468,18 @@ describe('POST /v1/public/:slug/bookings', () => {
     expect(await prisma.slotHold.count()).toBe(1);
   });
 
-  it('duas confirmações simultâneas do mesmo hold → uma 201 e uma 410', async () => {
+  it('Q-41: duas confirmações simultâneas do mesmo hold → a mesma reserva, criada uma vez', async () => {
     const { service } = await setupStudio();
     const { holdToken } = await hold('studio-ana', service.id);
     const results = await Promise.all([
       postBooking('studio-ana', holdToken),
       postBooking('studio-ana', holdToken, { phone: '+5511988887777' }),
     ]);
-    expect(results.map((r) => r.status).sort()).toEqual([201, 410]);
+    expect(results.map((r) => r.status)).toEqual([201, 201]);
+    const ids = results.map((r) => bookingResponseSchema.parse(r.body).appointmentId);
+    expect(ids[0]).toBe(ids[1]);
     expect(await prisma.appointment.count()).toBe(1);
+    expect(await prisma.client.count()).toBe(1);
   });
 
   it.each([

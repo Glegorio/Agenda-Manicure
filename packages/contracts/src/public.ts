@@ -33,6 +33,8 @@ export const publicProfileResponseSchema = z.object({
   themeMode: themeModeSchema,
   /** RN-92: exibida antes da confirmação (etapa 3). */
   cancellationPolicy: z.string().nullable(),
+  /** RN-25 / Q-42: até quantos dias à frente há agenda (a web limita o calendário). */
+  bookingHorizonDays: z.int().positive(),
   services: z.array(publicServiceSchema),
 });
 

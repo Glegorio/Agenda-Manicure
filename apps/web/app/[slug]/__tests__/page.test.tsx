@@ -13,6 +13,7 @@ const notFound = vi.fn(() => {
 vi.mock('next/navigation', () => ({ notFound: () => notFound() }));
 vi.mock('../_components/BookingFlowLoader', () => ({
   BookingFlowLoader: (props: {
+    bookingHorizonDays?: number;
     service: { name: string };
     initialDate?: string;
     initialSlot?: string;

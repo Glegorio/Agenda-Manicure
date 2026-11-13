@@ -105,6 +105,15 @@ describe('GET /v1/public/:slug', () => {
     expect(profile.services.map((s) => s.id)).toEqual([service.id, second.id]);
   });
 
+  it('Q-42 / RN-25: perfil informa o horizonte de agendamento', async () => {
+    const { pro } = await setupStudio();
+    await prisma.professional.update({ where: { id: pro.id }, data: { bookingHorizonDays: 90 } });
+
+    const res = await http().get('/v1/public/studio-ana').expect(200);
+
+    expect(publicProfileResponseSchema.parse(res.body).bookingHorizonDays).toBe(90);
+  });
+
   it('LGPD: não expõe e-mail, CEP, coordenadas nem hash de senha', async () => {
     await setupStudio();
     const res = await http().get('/v1/public/studio-ana').expect(200);

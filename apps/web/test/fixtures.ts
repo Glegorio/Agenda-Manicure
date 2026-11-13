@@ -12,5 +12,6 @@ export const profileFixture: PublicProfileResponse = {
   themePalette: 'PASTEL_LILAC',
   themeMode: 'SYSTEM',
   cancellationPolicy: null,
+  bookingHorizonDays: 30,
   services: [],
 };

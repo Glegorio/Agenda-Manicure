@@ -55,6 +55,7 @@ export class PublicService {
       themePalette: pro.themePalette,
       themeMode: pro.themeMode,
       cancellationPolicy: pro.cancellationPolicy,
+      bookingHorizonDays: pro.bookingHorizonDays,
       services,
     };
   }
