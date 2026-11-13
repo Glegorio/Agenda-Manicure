@@ -74,9 +74,13 @@ describe('BookingSuccess (3.6)', () => {
     const anchor = click.mock.contexts[0] as HTMLAnchorElement;
     expect(anchor.download).toBe('agendamento.ics');
     expect(screen.getByRole('status')).toHaveTextContent(/agendamento.ics baixado/);
-    await vi.waitFor(() => {
-      expect(revokeObjectURL).toHaveBeenCalledWith('blob:agendamento');
-    });
+    // A URL é revogada 1 s depois do clique (download no celular).
+    await vi.waitFor(
+      () => {
+        expect(revokeObjectURL).toHaveBeenCalledWith('blob:agendamento');
+      },
+      { timeout: 3000 },
+    );
   });
 
   it('avisa que o WhatsApp abre em nova aba', () => {
