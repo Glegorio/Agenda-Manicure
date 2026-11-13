@@ -99,7 +99,9 @@ parâmetro). Ver `.claude/rules/scheduling.md`.
   (a expiração depende de `now()`), então criação de hold e confirmação são serializadas por
   profissional com `pg_advisory_xact_lock` dentro da transação (ver ADR-0003).
 - **RN-43** — Confirmar (etapa 3) exige `hold_token` válido e não expirado; a confirmação
-  converte o hold em agendamento na mesma transação e apaga o hold.
+  converte o hold em agendamento na mesma transação e apaga o hold. Reenviar o mesmo
+  `hold_token` até 10 min depois de confirmado devolve a mesma reserva, sem criar outra
+  (resposta perdida na rede; Q-41).
 - **RN-44** — Hold expirado → `410 HOLD_EXPIRED`; a UI volta para a etapa 2 com mensagem
   amigável e a grade recarregada.
 - **RN-45** — A profissional, pelo app, **pode** criar agendamento manual que ignora
