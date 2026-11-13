@@ -123,6 +123,8 @@ describe('BookingFlow — etapa 3 (formulário)', () => {
 
     expect(await screen.findByRole('heading', { name: /Agendamento confirmado/ })).toHaveFocus();
     expect(loadHold('studio-ana')).toBeNull();
+    const whatsapp = screen.getByRole('link', { name: /Enviar confirmação pelo WhatsApp/ });
+    expect(decodeURIComponent(whatsapp.getAttribute('href') ?? '')).toContain('Olá Maria Souza');
   });
 
   it('RN-80 / RN-81: nome curto e telefone inválido: erros anunciados, foco no primeiro, sem envio', async () => {

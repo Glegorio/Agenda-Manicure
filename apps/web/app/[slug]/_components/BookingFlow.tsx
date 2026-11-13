@@ -21,6 +21,7 @@ import { publicApiBaseUrl } from '../../../lib/env';
 import { formatDuration } from '../../../lib/format';
 import { clearHold, loadHold, saveHold, type StoredHold } from '../../../lib/hold-storage';
 import styles from './BookingFlow.module.css';
+import { BookingSuccess } from './BookingSuccess';
 import { BookingForm, EMPTY_FORM, SLOT_TAKEN_MESSAGE, type FormValues } from './BookingForm';
 
 interface Service {
@@ -44,6 +45,8 @@ interface Props {
   browserTimeZone?: string | undefined;
   /** RN-92 / Q-35: exibida na etapa 3; `null` esconde a seção. */
   cancellationPolicy?: string | null | undefined;
+  /** Q-27: local publicado (endereço completo ou cidade/UF), para a confirmação. */
+  location?: string | null | undefined;
 }
 
 /** Resultado de uma consulta, indexado por ela: consulta nova = carregando, sem setState no effect. */
@@ -76,6 +79,7 @@ export function BookingFlow({
   api: injectedApi,
   browserTimeZone,
   cancellationPolicy = null,
+  location = null,
 }: Props) {
   const api = useMemo(() => injectedApi ?? createPublicClient(publicApiBaseUrl()), [injectedApi]);
 
@@ -107,7 +111,6 @@ export function BookingFlow({
 
   const alertRef = useRef<HTMLParagraphElement>(null);
   const dateTitleRef = useRef<HTMLHeadingElement>(null);
-  const bookedTitleRef = useRef<HTMLHeadingElement>(null);
   const focusAfterHold = useRef<'date' | 'alert' | null>(null);
 
   const daysFrom = `${month}-01` < today ? today : `${month}-01`;
@@ -167,10 +170,6 @@ export function BookingFlow({
     if (target === 'date') dateTitleRef.current?.focus();
     if (target === 'alert') alertRef.current?.focus();
   }, [held]);
-
-  useEffect(() => {
-    if (booked) bookedTitleRef.current?.focus();
-  }, [booked]);
 
   // Voltar/avançar do navegador: a tela segue a URL; sair da etapa 3 libera o hold.
   useEffect(() => {
@@ -281,20 +280,13 @@ export function BookingFlow({
 
   if (booked) {
     return (
-      <section className={styles.section} aria-labelledby="booked-title">
-        <h2 id="booked-title" ref={bookedTitleRef} tabIndex={-1} className={styles.title}>
-          Agendamento confirmado!
-        </h2>
-        {/* Tela de sucesso completa (WhatsApp, .ics) na 3.6. */}
-        <dl className={styles.summary}>
-          <dt>Serviço</dt>
-          <dd>{booked.serviceName}</dd>
-          <dt>Quando</dt>
-          <dd>{formatSlotLabel(booked.startAt, timezone)}</dd>
-          <dt>Valor</dt>
-          <dd>{formatBRL(booked.priceCents)}</dd>
-        </dl>
-      </section>
+      <BookingSuccess
+        slug={slug}
+        booking={booked}
+        clientName={formValues.name.trim()}
+        location={location}
+        showTimezone={showTz}
+      />
     );
   }
 

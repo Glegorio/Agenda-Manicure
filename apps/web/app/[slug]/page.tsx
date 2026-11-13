@@ -100,6 +100,7 @@ ${BODY_CSS}`}</style>
             initialDate={param(query, 'date', LOCAL_DATE)}
             initialSlot={param(query, 'slot', UTC_INSTANT)}
             cancellationPolicy={profile.cancellationPolicy}
+            location={formatLocation(profile)}
           />
         ) : (
           <ServiceList slug={profile.slug} services={profile.services} />

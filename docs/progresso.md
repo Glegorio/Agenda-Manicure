@@ -365,3 +365,19 @@
   **3.7** — reenvio após resposta perdida pode virar 410 mesmo com a reserva criada (sem
   idempotência); "Trocar serviço" não libera hold. Observações nunca em templates de WhatsApp (fase 5).
 - Próximo: 3.6 (tela de sucesso, `wa.me` sem número — Q-32 — e `.ics`).
+
+## 2026-11-13 — 3.6 concluída
+
+- `BookingSuccess`: foco no título, resumo da resposta do POST (não há GET público da reserva),
+  local conforme Q-27, fuso quando o navegador está em outro (RN-02a). CTA fixo "Enviar confirmação
+  pelo WhatsApp" (`wa.me` sem número, Q-32, nova aba avisada), "Adicionar ao calendário" (download
+  com aviso em `role=status`) e "Agendar outro horário". Recarregar a página volta à etapa 1.
+- `lib/whatsapp.ts`: texto padrão do doc 06 com data/hora de `lib/datetime.ts` (template editável na
+  5.2). `lib/ics.ts`: RFC 5545 (CRLF, UTC, escape, dobra em 75 octetos UTF-8).
+- Revisões: 🔴 corrigido — `\r` isolado e caracteres de controle no texto da profissional abriam
+  propriedade nova no `.ics` (agora viram `\n` escapado / são removidos; UID escapado). 🟡 aplicados:
+  download com âncora no DOM e revogação adiada, `.primaryLink` igual ao `.primary`, sem espaço morto.
+- Pendências: **8.5** — o texto do `wa.me` (nome, data, serviço, valor, endereço se publicado) passa
+  pela Meta na query string ao clicar; citar na política. `.ics` só em pt-BR.
+- Próximo: 3.7 (409/410 com volta à etapa 2 — boa parte já feita na 3.4/3.5; faltam idempotência
+  da confirmação, "Trocar serviço" liberando o hold e falha do `releaseHold`).
