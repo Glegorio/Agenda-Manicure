@@ -283,3 +283,16 @@
   SRI no script do CDN; paridade ainda não confere `auth`/`rateLimited`/schemas contra os
   controllers (tabela pode divergir em silêncio — ideal: controllers importarem da tabela).
 - Próximo: Fase 3 — `/iniciar-fase 3` (3.1 `packages/ui-tokens`).
+
+## 2026-11-13 — Fase 3 planejada; 3.1 concluída
+
+- Plano da fase (arquiteto). Decisões da usuária registradas: Q-32 (`wa.me` sem número), Q-33
+  (privacidade provisória, controladora = profissional), Q-34 (consentimento só se houver
+  observações), Q-35 (política só exibida, escondida se nula), Q-36 (PWA por profissional),
+  Q-37 (orçamento renegociável, TBT no lugar de TTI), Q-38 (e2e e Lighthouse na CI), Q-39 (CORS).
+- `packages/ui-tokens`: paletas light/dark, neutros, status RN-55, `contrastRatio`,
+  `getTheme`, `buildThemeCss`. 68 testes, cobertura 100%. Rose Gold, Nude e Lilac escurecidos
+  para AA; `onPrimary` escuro no dark. Doc 07 com os hex finais.
+- Pendente de aval: hold devolver snapshot (nome, preço, duração, Q-30) — só o CORS foi aprovado.
+  Na 3.4: CORS na API. Na 3.2: perfil com `revalidate: 60` (rate limit Q-25).
+- Próximo: 3.2 (rota `/[slug]` com tema, metadata/OG).

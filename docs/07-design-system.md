@@ -3,22 +3,26 @@
 Tokens vivem em `packages/ui-tokens` e são consumidos por web (CSS variables) e mobile
 (objeto de tema). **Nenhuma cor/raio/duração literal em componentes** — sempre token.
 
-## Paletas (primária) — validar contraste AA antes de congelar
+## Paletas (primária) — validadas AA (3.1)
 
-| Paleta         | `primary` (light) | `onPrimary` | `primary` (dark) | Observação                                          |
-| -------------- | ----------------- | ----------- | ---------------- | --------------------------------------------------- |
-| Rose Gold      | `#B76E79`         | `#FFFFFF`   | `#E8A9B2`        | conferir 4.5:1 do texto branco; escurecer se falhar |
-| Nude Minimal   | `#A9826B`         | `#FFFFFF`   | `#D9B8A3`        | idem                                                |
-| Elegance Black | `#1F1F1F`         | `#FFFFFF`   | `#F2F2F2`        | dark usa invertido                                  |
-| Pastel Lilac   | `#8E7CC3`         | `#FFFFFF`   | `#C7B9F0`        | idem                                                |
+| Paleta         | `primary` (light) | `onPrimary` (light) | `primary` (dark) | `onPrimary` (dark) |
+| -------------- | ----------------- | ------------------- | ---------------- | ------------------ |
+| Rose Gold      | `#9A5560`         | `#FFFFFF`           | `#E8A9B2`        | `#1F1416`          |
+| Nude Minimal   | `#86624D`         | `#FFFFFF`           | `#D9B8A3`        | `#1F1813`          |
+| Elegance Black | `#1F1F1F`         | `#FFFFFF`           | `#F2F2F2`        | `#1F1F1F`          |
+| Pastel Lilac   | `#6B58A6`         | `#FFFFFF`           | `#C7B9F0`        | `#1B1626`          |
 
-Os hex acima são **pontos de partida**. A fase 3 inclui um teste automatizado
-(`packages/ui-tokens/test/contrast.test.ts`) que calcula o contraste WCAG 2.1 de todas as
-combinações texto/fundo usadas e **falha abaixo de 4.5:1** (texto normal) ou **3:1**
-(texto grande ≥ 18.66 px bold / 24 px e componentes de UI).
+Os pontos de partida (`#B76E79`, `#A9826B`, `#8E7CC3`) falhavam 4.5:1 com texto branco e foram
+escurecidos; no dark o texto sobre a primary é escuro. Fonte: `packages/ui-tokens/src/palettes.ts`.
+`packages/ui-tokens/src/__tests__/contrast.test.ts` calcula o contraste WCAG 2.1 de todas as
+combinações texto/fundo usadas e **falha abaixo de 4.5:1** (texto, incluindo primary e danger como
+texto) ou **3:1** (borda, anel de foco e cores de status como componente de UI).
 
-Neutros e semânticos (comuns a todas as paletas): `background`, `surface`, `surfaceElevated`,
-`textPrimary`, `textSecondary`, `border`, `success`, `warning`, `danger`, `muted`.
+Neutros e semânticos (comuns a todas as paletas, valores em `NEUTRALS`): `background`, `surface`,
+`surfaceElevated`, `textPrimary`, `textSecondary`, `border`, `success`, `warning`, `danger`, `muted`;
+`focusRing` = primary. Web: `buildThemeCss(palette, mode)` gera `--color-*`, `--status-*`,
+`--space-*`, `--radius-*`, `--font-size-*`, `--motion-*` (`SYSTEM` usa `prefers-color-scheme`).
+Mobile: `getTheme(palette, scheme)`.
 
 Status da agenda (RN-55): `status.scheduled = primary`, `status.inProgress = warning`,
 `status.completed = success`, `status.cancelled = muted` (+ texto riscado),

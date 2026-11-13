@@ -53,7 +53,7 @@
 
 ## Fase 3 — Web Booking Engine (`apps/web`)
 
-- [ ] 3.1 `packages/ui-tokens` + teste de contraste AA + CSS variables por paleta/modo
+- [x] 3.1 `packages/ui-tokens` + teste de contraste AA + CSS variables por paleta/modo
 - [ ] 3.2 Rota `/[slug]` (RSC) com tema da profissional, metadata/OG
 - [ ] 3.3 Etapa 1 — cards de serviço
 - [ ] 3.4 Etapa 2 — calendário (dias com vaga) + grade de slots; cria hold ao avançar
