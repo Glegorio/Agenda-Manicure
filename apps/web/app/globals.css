@@ -1,4 +1,4 @@
-/* Reset mínimo. Tokens de tema (CSS variables) chegam com packages/ui-tokens (tarefa 3.1). */
+/* Reset mínimo. Tema (CSS variables de @agende/ui-tokens) é injetado por rota, ex.: /[slug]. */
 *,
 *::before,
 *::after {

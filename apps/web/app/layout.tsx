@@ -1,8 +1,10 @@
 import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
 import './globals.css';
+import { siteUrl } from '../lib/env';
 
 export const metadata: Metadata = {
+  metadataBase: siteUrl(),
   title: 'Agende',
   description: 'Agende seu horário em poucos toques.',
 };

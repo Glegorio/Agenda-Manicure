@@ -283,3 +283,101 @@
   SRI no script do CDN; paridade ainda não confere `auth`/`rateLimited`/schemas contra os
   controllers (tabela pode divergir em silêncio — ideal: controllers importarem da tabela).
 - Próximo: Fase 3 — `/iniciar-fase 3` (3.1 `packages/ui-tokens`).
+
+## 2026-11-13 — Fase 3 planejada; 3.1 concluída
+
+- Plano da fase (arquiteto). Decisões da usuária registradas: Q-32 (`wa.me` sem número), Q-33
+  (privacidade provisória, controladora = profissional), Q-34 (consentimento só se houver
+  observações), Q-35 (política só exibida, escondida se nula), Q-36 (PWA por profissional),
+  Q-37 (orçamento renegociável, TBT no lugar de TTI), Q-38 (e2e e Lighthouse na CI), Q-39 (CORS).
+- `packages/ui-tokens`: paletas light/dark, neutros, status RN-55, `contrastRatio`,
+  `getTheme`, `buildThemeCss`. 68 testes, cobertura 100%. Rose Gold, Nude e Lilac escurecidos
+  para AA; `onPrimary` escuro no dark. Doc 07 com os hex finais.
+- Hold devolver snapshot (nome, preço, duração, Q-30): aprovado depois (Q-40).
+  Na 3.4: CORS na API. Na 3.2: perfil com `revalidate: 60` (rate limit Q-25).
+- Próximo: 3.2 (rota `/[slug]` com tema, metadata/OG).
+
+## 2026-11-13 — 3.2 concluída
+
+- `/[slug]` RSC sem JS de cliente: `getPublicProfile` (`lib/api/public-server.ts`) valida o slug
+  (RN-90) antes de chamar a API, cache `revalidate: 60` (Q-25) deduplicado com `cache()` do React;
+  404 → `notFound()`, 5xx → `error.tsx` em PT-BR. Tema por `buildThemeCss` (inclui `body`),
+  `theme-color` por modo (SYSTEM com `media`), metadata/canonical/OG e `opengraph-image`.
+  Cabeçalho segue Q-27.
+- Variáveis novas no exemplo de ambiente da web: `NEXT_PUBLIC_SITE_URL` e `API_INTERNAL_BASE_URL`
+  (opcional) — a usuária precisa copiá-las para o arquivo local.
+- Revisões 3.1 e 3.2: sem 🔴. 🟡 abertos: testes de contraste não cobrem muted/success/warning como
+  texto nem `surfaceElevated`; `--touch-target` e `prefers-reduced-motion` nos tokens; fontes em px
+  (preferir rem); `focusRing = primary` some sobre botão primário; URLs com fallback localhost em
+  produção; sem testes de `opengraph-image` e `lib/env.ts`. 404 de slug novo fica em cache até 60 s.
+- Próximo: 3.3 (cards de serviço).
+
+## 2026-11-13 — 3.1 (ajustes) e 3.3 concluídas
+
+- Ajustes da revisão da 3.1 (`fix/3.1-tokens-a11y`): contraste testado para toda cor usada como
+  texto nos três fundos; `--touch-target`, anel de foco com offset, fontes em `rem`,
+  `prefers-reduced-motion` zera `--motion-*`. Q-40 (hold devolve o snapshot) aprovada.
+- 3.3: `ServiceList` (RSC, sem JS de cliente) com cards-link para `?service=<id>`, preço por
+  `formatBRL` (RN-77), duração por `formatDuration`, imagem decorativa só com `imageUrl` (`<img>`
+  até Q-09), estado vazio, `prefetch={false}`. A página ainda não lê `?service=`: o clique só muda a
+  URL até a 3.4.
+- Pendências: `apps/web/AGENTS.md` gerado pelo `next dev` ficou fora do commit (versionar ou
+  ignorar?); nome do card no leitor de tela começa pela categoria (avaliar na 3.9 com axe).
+- Próximo: 3.4 (calendário + grade + hold; CORS e snapshot do hold na API).
+
+## 2026-11-13 — 3.4 concluída
+
+- API: CORS por `CORS_ORIGINS` (Q-39, `common/cors.ts`, aviso no log se vazio, sem `Authorization`);
+  hold devolve `startAt/endAt/serviceName/priceCents/durationMin` do snapshot (Q-40). Doc 05 atualizado.
+- Web: `BookingFlow` (só no cliente via `BookingFlowLoader`, `ssr: false`): calendário do mês com dias
+  de `availability/days` a partir de "hoje" no fuso da profissional, grade de `availability`, hold ao
+  "Continuar" com o `startAt` exato (RN-40), token só na sessionStorage, hold anterior liberado antes
+  do novo, 409 avisa e recarrega (RN-41), resumo do hold (formulário na 3.5). Estado na URL pela
+  History API (sem ida ao servidor); Voltar sai da etapa 3 e libera o hold. Datas/horas por `Intl`
+  (`lib/datetime.ts`), cliente só com tipos de `@agende/contracts` (sem Zod no bundle). ESLint proíbe
+  `@agende/scheduling` na web (regra 2).
+- Revisões: 🔴 corrigidos — resumo não aparecia após o hold (estado só na montagem) e Voltar não
+  sincronizava; `?date=` impossível derrubava a página; regiões vivas sempre montadas, "Tentar de
+  novo" nas falhas e foco após 409/hold/troca de horário.
+- Pendências: `MAX_MONTHS_AHEAD = 2` fixo (o perfil público não expõe `booking_horizon_days`; horizonte
+  > ~60 dias fica inalcançável) — decisão de produto; token do hold no path do `DELETE` (mover para
+  > body/header ou cortar do log na 8.2); `releaseHold` ignora falha (3.7); margem de ~2 s no contador
+  > (3.5); "Trocar serviço" não libera hold ativo.
+- Próximo: 3.5 (formulário, máscara de telefone, contador do hold, política de cancelamento).
+
+## 2026-11-13 — 3.5 concluída
+
+- `BookingForm`: nome, WhatsApp com máscara BR → E.164 (`lib/phone.ts`, DDD válido, celular com 9,
+  fixo [2-5], `+55`/`0` colados; DDD 55 não é confundido com código do país), observações ≤ 500 com
+  contador e orientação sobre saúde; consentimento só com observações e zerado quando elas são
+  apagadas (Q-34); política de cancelamento antes do CTA, escondida se nula (Q-35, RN-92); link para
+  `/privacidade` em nova aba (Q-33, texto provisório, controladora = profissional).
+- Contador do hold no relógio do servidor com margem de 2 s (`lib/countdown.ts`); leitor de tela só
+  avisa no último minuto. Zerou, 410 ou 409 → volta à etapa 2 com aviso, foco no aviso e dados
+  digitados mantidos em memória (RN-44). Confirmação mínima (tela completa na 3.6). Duplo envio
+  bloqueado por ref.
+- Revisões: sem 🔴. Corrigidos 🟡: máscara com DDD 55, consentimento persistente, tela travada em
+  0:00 após envio com erro de rede, teste de duplo envio que não provava nada, erros que não sumiam
+  ao corrigir, campos obrigatórios, alvo de toque do consentimento, folga da barra fixa a 200%.
+- Pendências: **8.1** — consentimento de saúde só existe na UI (API aceita `notes` sem aceite; gravar
+  `notes_consent_at` + versão do texto); logs da API não podem gravar corpo/telefone. **8.5** — texto
+  final da privacidade com versão, bases legais, retenção, contato da profissional, exportar/excluir.
+  **3.7** — reenvio após resposta perdida pode virar 410 mesmo com a reserva criada (sem
+  idempotência); "Trocar serviço" não libera hold. Observações nunca em templates de WhatsApp (fase 5).
+- Próximo: 3.6 (tela de sucesso, `wa.me` sem número — Q-32 — e `.ics`).
+
+## 2026-11-13 — 3.6 concluída
+
+- `BookingSuccess`: foco no título, resumo da resposta do POST (não há GET público da reserva),
+  local conforme Q-27, fuso quando o navegador está em outro (RN-02a). CTA fixo "Enviar confirmação
+  pelo WhatsApp" (`wa.me` sem número, Q-32, nova aba avisada), "Adicionar ao calendário" (download
+  com aviso em `role=status`) e "Agendar outro horário". Recarregar a página volta à etapa 1.
+- `lib/whatsapp.ts`: texto padrão do doc 06 com data/hora de `lib/datetime.ts` (template editável na
+  5.2). `lib/ics.ts`: RFC 5545 (CRLF, UTC, escape, dobra em 75 octetos UTF-8).
+- Revisões: 🔴 corrigido — `\r` isolado e caracteres de controle no texto da profissional abriam
+  propriedade nova no `.ics` (agora viram `\n` escapado / são removidos; UID escapado). 🟡 aplicados:
+  download com âncora no DOM e revogação adiada, `.primaryLink` igual ao `.primary`, sem espaço morto.
+- Pendências: **8.5** — o texto do `wa.me` (nome, data, serviço, valor, endereço se publicado) passa
+  pela Meta na query string ao clicar; citar na política. `.ics` só em pt-BR.
+- Próximo: 3.7 (409/410 com volta à etapa 2 — boa parte já feita na 3.4/3.5; faltam idempotência
+  da confirmação, "Trocar serviço" liberando o hold e falha do `releaseHold`).

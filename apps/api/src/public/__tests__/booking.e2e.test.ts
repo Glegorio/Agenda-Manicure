@@ -86,6 +86,20 @@ describe('POST /v1/public/:slug/holds', () => {
     expect(stored.tokenHash).not.toBe(created.holdToken);
   });
 
+  it('Q-30 / Q-40: o hold devolve o snapshot do serviço para a etapa 3', async () => {
+    const { service } = await setupStudio();
+
+    const created = await hold('studio-ana', service.id);
+
+    expect(created).toMatchObject({
+      startAt: FRIDAY_10,
+      endAt: '2026-11-13T14:00:00.000Z',
+      serviceName: 'Esmaltação em Gel',
+      priceCents: 7000,
+      durationMin: 60,
+    });
+  });
+
   it('RN-40: o horário em hold some da grade', async () => {
     const { service } = await setupStudio();
     await hold('studio-ana', service.id);

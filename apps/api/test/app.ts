@@ -11,6 +11,7 @@ import { JOBS_CONFIG } from '../src/jobs/jobs.service.js';
 import { DATABASE_URL } from '../src/prisma/prisma.service.js';
 import { FixedClock } from './clock.js';
 import { TEST_DATABASE_URL, assertTestDatabase } from './database.js';
+import { configureCors } from '../src/common/cors.js';
 
 /** Config de auth dos testes (não depende de variáveis de ambiente). */
 export const TEST_AUTH_CONFIG: AuthConfig = {
@@ -28,7 +29,12 @@ export const DEFAULT_TEST_NOW = '2026-11-12T12:00:00Z';
  * `imports` extras servem para controllers de teste. Feche com `app.close()`.
  */
 export async function createTestApp(
-  options: { clock?: Clock; imports?: ModuleMetadata['imports']; rateLimit?: boolean } = {},
+  options: {
+    clock?: Clock;
+    imports?: ModuleMetadata['imports'];
+    rateLimit?: boolean;
+    corsOrigins?: string[];
+  } = {},
 ): Promise<INestApplication<App>> {
   assertTestDatabase();
   configureContractsLocale();
@@ -47,6 +53,7 @@ export async function createTestApp(
     .useValue(options.clock ?? new FixedClock(DEFAULT_TEST_NOW))
     .compile();
   const app = moduleRef.createNestApplication<INestApplication<App>>();
+  configureCors(app, options.corsOrigins ?? []);
   await app.init();
   return app;
 }
