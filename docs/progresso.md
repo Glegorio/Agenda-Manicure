@@ -296,3 +296,18 @@
 - Pendente de aval: hold devolver snapshot (nome, preço, duração, Q-30) — só o CORS foi aprovado.
   Na 3.4: CORS na API. Na 3.2: perfil com `revalidate: 60` (rate limit Q-25).
 - Próximo: 3.2 (rota `/[slug]` com tema, metadata/OG).
+
+## 2026-11-13 — 3.2 concluída
+
+- `/[slug]` RSC sem JS de cliente: `getPublicProfile` (`lib/api/public-server.ts`) valida o slug
+  (RN-90) antes de chamar a API, cache `revalidate: 60` (Q-25) deduplicado com `cache()` do React;
+  404 → `notFound()`, 5xx → `error.tsx` em PT-BR. Tema por `buildThemeCss` (inclui `body`),
+  `theme-color` por modo (SYSTEM com `media`), metadata/canonical/OG e `opengraph-image`.
+  Cabeçalho segue Q-27.
+- Variáveis novas no exemplo de ambiente da web: `NEXT_PUBLIC_SITE_URL` e `API_INTERNAL_BASE_URL`
+  (opcional) — a usuária precisa copiá-las para o arquivo local.
+- Revisões 3.1 e 3.2: sem 🔴. 🟡 abertos: testes de contraste não cobrem muted/success/warning como
+  texto nem `surfaceElevated`; `--touch-target` e `prefers-reduced-motion` nos tokens; fontes em px
+  (preferir rem); `focusRing = primary` some sobre botão primário; URLs com fallback localhost em
+  produção; sem testes de `opengraph-image` e `lib/env.ts`. 404 de slug novo fica em cache até 60 s.
+- Próximo: 3.3 (cards de serviço).
