@@ -10,3 +10,6 @@ export const fontSize = { sm: 14, md: 16, lg: 18, xl: 22, xxl: 28 } as const;
 
 /** Alvo de toque mínimo (48 dp Android ≥ 44 pt iOS). */
 export const touchTarget = 48;
+
+/** Anel de foco desenhado fora do controle (offset), sobre o fundo da página: não some no botão primário. */
+export const focusRing = { width: 2, offset: 2 } as const;

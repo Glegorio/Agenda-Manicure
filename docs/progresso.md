@@ -293,7 +293,7 @@
 - `packages/ui-tokens`: paletas light/dark, neutros, status RN-55, `contrastRatio`,
   `getTheme`, `buildThemeCss`. 68 testes, cobertura 100%. Rose Gold, Nude e Lilac escurecidos
   para AA; `onPrimary` escuro no dark. Doc 07 com os hex finais.
-- Pendente de aval: hold devolver snapshot (nome, preço, duração, Q-30) — só o CORS foi aprovado.
+- Hold devolver snapshot (nome, preço, duração, Q-30): aprovado depois (Q-40).
   Na 3.4: CORS na API. Na 3.2: perfil com `revalidate: 60` (rate limit Q-25).
 - Próximo: 3.2 (rota `/[slug]` com tema, metadata/OG).
 

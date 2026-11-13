@@ -24,20 +24,42 @@ describe('buildThemeCss', () => {
     expect(css).toContain(getTheme('NUDE_MINIMAL', 'dark').colors.primary);
   });
 
-  it('nenhum token vazio e os mesmos tokens nos dois modos', () => {
-    const light = declarations(buildThemeCss('ELEGANCE_BLACK', 'LIGHT'));
-    const dark = declarations(buildThemeCss('ELEGANCE_BLACK', 'DARK'));
+  it('nenhum token vazio e os mesmos nomes de token nos dois modos', () => {
+    const withoutMedia = (css: string) => css.slice(0, css.indexOf('@media'));
+    const light = declarations(withoutMedia(buildThemeCss('ELEGANCE_BLACK', 'LIGHT')));
+    const dark = declarations(withoutMedia(buildThemeCss('ELEGANCE_BLACK', 'DARK')));
     expect(light.length).toBeGreaterThan(20);
     expect(light.map((d) => d[1])).toEqual(dark.map((d) => d[1]));
     for (const [, , value] of [...light, ...dark]) expect(value?.trim()).not.toBe('');
   });
 
-  it('expõe espaço, raio e movimento', () => {
+  it('expõe espaço, raio, movimento, alvo de toque e anel de foco', () => {
     const css = buildThemeCss('ROSE_GOLD', 'LIGHT');
     expect(css).toContain('--space-4: 16px;');
     expect(css).toContain('--radius-md: 12px;');
     expect(css).toContain('--motion-base: 220ms;');
+    expect(css).toContain('--touch-target: 48px;');
+    expect(css).toContain('--focus-ring-width: 2px;');
+    expect(css).toContain('--focus-ring-offset: 2px;');
   });
+
+  it('fontes em rem, respeitando o tamanho de fonte do usuário', () => {
+    const css = buildThemeCss('ROSE_GOLD', 'LIGHT');
+    expect(css).toContain('--font-size-md: 1rem;');
+    expect(css).toContain('--font-size-sm: 0.875rem;');
+    expect(css).not.toMatch(/--font-size-[a-z]+: [0-9.]+px/);
+  });
+
+  it.each(['LIGHT', 'DARK', 'SYSTEM'] as const)(
+    'prefers-reduced-motion zera as durações (%s)',
+    (mode) => {
+      const css = buildThemeCss('ROSE_GOLD', mode);
+      const reduced = css.slice(css.indexOf('@media (prefers-reduced-motion: reduce)'));
+      expect(css).toContain('@media (prefers-reduced-motion: reduce)');
+      for (const name of ['fast', 'base', 'slow'])
+        expect(reduced).toContain(`--motion-${name}: 0ms;`);
+    },
+  );
 
   it('usa o seletor informado', () => {
     expect(buildThemeCss('ROSE_GOLD', 'LIGHT', '[data-theme]')).toMatch(/^\[data-theme\] \{/);
