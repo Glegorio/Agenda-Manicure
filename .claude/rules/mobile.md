@@ -21,3 +21,6 @@ paths:
 - Testes: jest-expo + React Native Testing Library para componentes com lógica; fluxos críticos
   (fechamento diário, transições) com testes de integração da tela.
 - Testes **nunca** dentro de `app/` (o Expo Router transforma todo arquivo ali em rota): use `apps/mobile/__tests__/`.
+- **Nunca crie `apps/mobile/src/app/`**: o Expo Router usa `src/app` como raiz de rotas quando ela
+  existe, e ela tem prioridade sobre `app/` (o app abre em "Unmatched Route"). Os testes com
+  `renderRouter` não pegam isso, porque recebem as rotas explicitamente.

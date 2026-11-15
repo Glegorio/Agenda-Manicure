@@ -1,7 +1,7 @@
 import { fireEvent, screen } from '@testing-library/react-native';
 import { renderRouter } from 'expo-router/testing-library';
 import { createApiClient } from '../src/api/client';
-import { createRootLayout } from '../src/app/RootLayout';
+import { createRootLayout } from '../src/navigation/RootLayout';
 import { SESSION_KEY, SessionManager } from '../src/auth/session';
 import TabsLayout from '../app/(tabs)/_layout';
 import AgendaScreen from '../app/(tabs)/index';

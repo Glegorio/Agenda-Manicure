@@ -2,7 +2,8 @@ import { Tabs } from 'expo-router/js-tabs';
 import type { ColorValue } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { CalendarDays, Scissors, Settings, Users, type LucideIcon } from 'lucide-react-native';
-import { fontSize, touchTarget } from '@agende/ui-tokens';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { fontSize, space } from '@agende/ui-tokens';
 import { useTheme } from '../../src/theme/ThemeProvider';
 
 function tabIcon(Icon: LucideIcon) {
@@ -14,14 +15,21 @@ function tabIcon(Icon: LucideIcon) {
 /** Navegação principal por tabs inferiores (doc 07, thumb zone). */
 export default function TabsLayout() {
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.textSecondary,
-        tabBarStyle: { backgroundColor: colors.surface, borderTopColor: colors.border },
-        tabBarItemStyle: { minHeight: touchTarget },
+        // A altura padrão (49) corta o rótulo de 14 px (mínimo do doc 07); a altura própria
+        // substitui a do navegador, então a safe area entra aqui.
+        tabBarStyle: {
+          backgroundColor: colors.surface,
+          borderTopColor: colors.border,
+          height: 64 + insets.bottom,
+          paddingTop: space[1],
+        },
         tabBarLabelStyle: { fontSize: fontSize.sm },
       }}
       screenListeners={{ tabPress: () => void Haptics.selectionAsync() }}
