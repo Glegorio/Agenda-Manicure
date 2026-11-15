@@ -86,8 +86,8 @@ Regra: **controller não fala com Prisma**; **domínio não importa NestJS nem P
 
 - Página pública do slug renderizada no servidor (RSC) com dados de perfil/serviços em cache
   (revalidate curto); slots buscados no cliente para a data escolhida.
-- Orçamento de JS da rota pública: **≤ 120 KB gz**. Imagens via `next/image`, AVIF/WebP.
-- Medir com Lighthouse (perfil "Slow 4G", mobile) em CI na fase de hardening.
+- Orçamento de JS da rota pública: **≤ 150 KB gz na etapa 1 e ≤ 170 KB gz na etapa 2 (renegociado na Q-37; ADR-0011)**. Imagens via `next/image`, AVIF/WebP.
+- Medido com Lighthouse (perfil "Slow 4G", mobile) na CI, job `e2e` (3.10, `apps/web/e2e/lighthouse.spec.ts`).
 
 ## Observabilidade
 

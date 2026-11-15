@@ -1,11 +1,13 @@
 ---
 paths:
-  - "apps/web/**"
+  - 'apps/web/**'
 ---
 
 # Regras — Web Booking (Next.js PWA)
 
-- Público-alvo: celular, 3G/4G. **Orçamento de JS da rota `/[slug]` ≤ 120 KB gz.**
+- Público-alvo: celular, 3G/4G. **Orçamento de JS da rota `/[slug]`: etapa 1 ≤ 150 KB gz, etapa 2
+  ≤ 170 KB gz** (renegociado na Q-37: a base do Next 16 + React já tem ~121 KB). LCP < 2,5 s e
+  TBT ≤ 200 ms no Lighthouse mobile — `pnpm --filter web test:lighthouse`.
   Prefira Server Components; marque `"use client"` só no que é interativo (seleção, formulário).
 - Não adicione dependência pesada (UI kits, moment, lodash completo) sem perguntar.
 - Fluxo de 3 etapas (spec 3.3) com estado na URL (`?service=&date=&slot=`) para permitir voltar/compartilhar.

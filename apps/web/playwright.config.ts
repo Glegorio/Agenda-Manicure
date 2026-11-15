@@ -22,7 +22,20 @@ export default defineConfig({
     timezoneId: 'America/Sao_Paulo',
     trace: 'retain-on-failure',
   },
-  projects: [{ name: 'mobile-chromium', use: { ...devices['Pixel 7'] } }],
+  projects: [
+    {
+      name: 'mobile-chromium',
+      use: { ...devices['Pixel 7'] },
+      testIgnore: /lighthouse\.spec\.ts/,
+    },
+    // 3.10: navegador próprio com porta de depuração; o Lighthouse aplica o perfil mobile.
+    {
+      name: 'lighthouse',
+      testMatch: /lighthouse\.spec\.ts/,
+      // Roda depois do e2e: medir com a CPU disputada distorceria o Lighthouse.
+      dependencies: ['mobile-chromium'],
+    },
+  ],
   webServer: [
     {
       name: 'api',

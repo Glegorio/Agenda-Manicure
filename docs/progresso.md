@@ -441,3 +441,17 @@
   `agende_e2e` (hoje divide `agende_test` com a suíte da API — não rodar juntas); axe nas outras
   paletas e nos estados de erro; teste de RN-02a com navegador em outro fuso.
 - Próximo: 3.10 (Lighthouse mobile — LCP < 2,5 s, TBT ≤ 200 ms no lugar de TTI, Q-37).
+
+## 2026-11-15 — 3.10 concluída
+
+- `apps/web/e2e/lighthouse.spec.ts` (projeto `lighthouse` do Playwright, depende do e2e):
+  Lighthouse mobile com Slow 4G nas etapas 1 e 2; asserções de LCP < 2,5 s, TBT ≤ 200 ms (no lugar
+  do TTI, Q-37), CLS e orçamento de JS. Medido: LCP ~0,92 s, TBT ~85 ms, JS 141/150 KB (etapa 1)
+  e 149/170 KB (etapa 2). `pnpm --filter web test:lighthouse`; a CI roda no job `e2e`.
+- Decisão: orçamento de JS renegociado (Q-37, ADR-0011), porque a base do Next 16 + React já tem ~121 KB.
+- Revisão: sem 🔴. Corrigidos: ADR-0007 aceito revertido (a renegociação fica só no ADR-0011),
+  doc 03 atualizado e atribuição da Q-37.
+- Pendências: folga de ~9 KB na etapa 1 (um patch do Next pode estourar; subir o teto exige nova
+  entrada na Q-37); etapas 3 e sucesso não medidas (mesmo chunk); `apps/web/AGENTS.md` gerado
+  pelo Next fica fora do commit.
+- Próximo: Fase 4 — `/iniciar-fase 4` (4.1: tema, tabs, HTTP + TanStack Query, auth com SecureStore).

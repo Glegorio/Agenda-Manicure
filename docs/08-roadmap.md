@@ -5,7 +5,7 @@
 > `/registrar-progresso` ao fim de cada sessão. Marque `[x]` somente quando os critérios de
 > aceite da tarefa passarem (testes verdes + lint + typecheck).
 
-**Fase atual:** 3
+**Fase atual:** 4
 
 ---
 
@@ -62,7 +62,7 @@
 - [x] 3.7 Tratamento de 409/410 com volta à etapa 2
 - [x] 3.8 PWA: manifest, ícones, service worker com cache de shell (sem cachear slots)
 - [x] 3.9 Playwright: fluxo feliz, slot tomado, hold expirado; axe-core sem violações
-- [ ] 3.10 Lighthouse mobile (Slow 4G) — LCP < 2,5 s, TTI < 2 s na rota pública
+- [x] 3.10 Lighthouse mobile (Slow 4G) — LCP < 2,5 s, TBT ≤ 200 ms no lugar do TTI (Q-37) na rota pública
 
 ## Fase 4 — App mobile: configuração e Agenda Hub (`apps/mobile`)
 

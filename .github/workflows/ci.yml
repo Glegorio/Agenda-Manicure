@@ -131,5 +131,6 @@ jobs:
       - name: Instalar Chromium
         run: pnpm --filter web exec playwright install --with-deps chromium
 
-      - name: E2E
-        run: pnpm --filter web test:e2e
+      # E2E e depois Lighthouse (3.10 / Q-37) numa chamada só: os servidores sobem uma vez.
+      - name: E2E e Lighthouse
+        run: pnpm --filter web exec playwright test
