@@ -66,7 +66,7 @@
 
 ## Fase 4 — App mobile: configuração e Agenda Hub (`apps/mobile`)
 
-- [ ] 4.1 Tema (tokens), navegação por tabs, cliente HTTP + TanStack Query, auth com SecureStore
+- [x] 4.1 Tema (tokens), navegação por tabs, cliente HTTP + TanStack Query, auth com SecureStore
 - [ ] 4.2 Onboarding: perfil, slug, paleta, endereço (com geolocalização opcional)
 - [ ] 4.3 Serviços (lista + formulário com CTA no rodapé)
 - [ ] 4.4 Escala semanal + exceções + buffer/step/antecedência

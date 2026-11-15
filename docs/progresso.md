@@ -455,3 +455,30 @@
   entrada na Q-37); etapas 3 e sucesso não medidas (mesmo chunk); `apps/web/AGENTS.md` gerado
   pelo Next fica fora do commit.
 - Próximo: Fase 4 — `/iniciar-fase 4` (4.1: tema, tabs, HTTP + TanStack Query, auth com SecureStore).
+
+## 2026-11-15 — 4.1 concluída
+
+- `apps/mobile`: `SessionManager` (`src/auth/session.ts`) guarda a sessão só no SecureStore,
+  renova o access com refresh _single-flight_ (rotação, ADR-0009), só encerra a sessão em 401, não
+  ressuscita a sessão se o logout acontecer durante um refresh, e usa timeout de 15 s nos pedidos
+  (`AbortController`; o `fetch` do RN não tem timeout). O logout limpa a sessão local antes de
+  revogar na API.
+- `createApiClient` (`src/api/client.ts`): Bearer, 401 → refresh → repete uma vez, envelope de erro
+  → `ApiError` (código e mensagem PT-BR da API; `NETWORK` sem conexão). Fora do `__DEV__`, a base
+  URL precisa ser `https://`.
+- TanStack Query (`queryClient.ts`: não repete 4xx; cache limpo ao sair), `useProfile` (`/me`).
+  `ThemeProvider` aplica a paleta e o modo do `/me` (SYSTEM segue o aparelho). `Stack.Protected`
+  separa login/cadastro das tabs (Agenda, Clientes, Serviços, Ajustes, com Lucide e haptics).
+  `BottomActionBar`, `Button`, `TextField`, `Screen` (com `KeyboardAvoidingView`).
+- Testes: 29 (sessão, cliente HTTP, tema, URL e fluxo de auth com `renderRouter`). Jest: o lucide
+  usa o build CJS (`moduleNameMapper`; `.mjs` é sempre ESM no Jest) e `transformIgnorePatterns` aceita o `.pnpm`.
+- Revisões: sem 🔴. Corrigidos: logout pendurado, HTTPS fora do dev, sessão ressuscitada pelo
+  refresh, falha do SecureStore perdendo o par rotacionado, `clear()` sem avisar a UI, teclado
+  cobrindo o CTA, 400 encerrando a sessão.
+- Pendências: validar BigInt e `Intl` com `timeZone` no Hermes num dev build real (o Jest roda em
+  Node); `focusManager`/`onlineManager` do TanStack (AppState/NetInfo) na 4.5; `ajustes` mostra
+  nome e e-mail da sessão, que podem ficar velhos quando a 4.2 editar o perfil (usar `useProfile`);
+  o tema pisca a paleta padrão até o `/me` responder; `.expo/types/router.d.ts` local estava velho
+  (rodar `expo start` regenera as rotas tipadas).
+- Próximo: 4.2 (onboarding). Perguntas de produto da Fase 4 ainda em aberto: localização (4.2),
+  troca de fuso (4.4), payload do SSE (4.5), consentimento/duplicados/DDI/tags (4.7), Q-09.
